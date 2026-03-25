@@ -1,0 +1,1438 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Imperio Mayde"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="theme-color" content="#0A0A0A"/>
+<title>Imperio Mayde™</title>
+<style>
+:root{
+  --gold:#C9A84C;--gold2:#F0C060;--gold3:#8B6914;
+  --bg:#0A0A0A;--bg2:#111111;--bg3:#181818;--bg4:#222222;
+  --border:#2A2A2A;--border2:#333;
+  --text:#F0EDE8;--text2:#A09A90;--text3:#6A6560;
+  --green:#22C55E;--red:#EF4444;--blue:#3B82F6;--purple:#A855F7;
+  --safe-top:env(safe-area-inset-top,44px);
+  --safe-bot:env(safe-area-inset-bottom,34px);
+  --safe-l:env(safe-area-inset-left,0px);
+  --safe-r:env(safe-area-inset-right,0px);
+  --tab-h:68px;
+  --top-h:56px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html{background:var(--bg);height:100%;}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sans-serif;height:100%;overflow:hidden;position:fixed;width:100%;}
+
+/* ── TOPBAR ── */
+.topbar{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  background:rgba(10,10,10,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  padding-top:var(--safe-top);
+  height:calc(var(--top-h) + var(--safe-top));
+}
+.topbar-inner{height:var(--top-h);display:flex;align-items:center;justify-content:space-between;padding:0 16px;}
+.brand-row{display:flex;align-items:center;gap:10px;}
+.brand-logo{width:34px;height:34px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#000;overflow:hidden;flex-shrink:0;border:1.5px solid var(--gold3);}
+.brand-logo img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+.brand-info .name{font-size:15px;font-weight:700;color:var(--gold);line-height:1.1;}
+.brand-info .slogan{font-size:10px;color:var(--text3);font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px;}
+.topbar-right{display:flex;gap:8px;align-items:center;}
+.icon-btn{width:34px;height:34px;border-radius:50%;background:var(--bg3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;flex-shrink:0;}
+.save-dot{width:8px;height:8px;border-radius:50%;background:var(--text3);}
+.save-dot.ok{background:var(--green);}
+.save-dot.busy{background:var(--gold);animation:pulse .6s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ── SCROLL AREA ── */
+.scroll-wrap{
+  position:fixed;
+  top:calc(var(--top-h) + var(--safe-top));
+  left:0;right:0;
+  bottom:calc(var(--tab-h) + var(--safe-bot));
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior:none;
+}
+.page{display:none;padding:16px 16px 8px;}
+.page.active{display:block;}
+
+/* ── TAB BAR ── */
+.tabbar{
+  position:fixed;bottom:0;left:0;right:0;z-index:200;
+  background:rgba(10,10,10,.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-top:1px solid var(--border);
+  padding-bottom:var(--safe-bot);
+  height:calc(var(--tab-h) + var(--safe-bot));
+}
+.tabs{display:flex;height:var(--tab-h);}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;position:relative;color:var(--text3);transition:color .15s;}
+.tab.active{color:var(--gold);}
+.tab-ico{font-size:22px;line-height:1;}
+.tab-lbl{font-size:9px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;}
+.tab-badge{position:absolute;top:6px;right:calc(50% - 18px);background:var(--gold);color:#000;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;min-width:16px;text-align:center;line-height:14px;}
+
+/* ── CARDS ── */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px;}
+.card-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px;}
+.card-ttl{font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px;}
+.section-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin:14px 0 7px;font-weight:600;}
+.section-lbl:first-child{margin-top:0;}
+
+/* ── METRICS ── */
+.metrics-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.mc{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px;}
+.ml{font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;}
+.mv{font-size:26px;font-weight:700;color:var(--gold);}
+.mi{width:100%;border:none;background:none;font-size:26px;font-weight:700;color:var(--gold);outline:none;font-family:inherit;}
+
+/* ── DATA ITEMS ── */
+.di{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px 15px;margin-bottom:8px;active:background(var(--bg4));}
+.di-hdr{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
+.di-ttl{font-size:14px;font-weight:600;color:var(--text);line-height:1.3;}
+.di-meta{display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin-top:6px;}
+.di-body{font-size:12px;color:var(--text2);line-height:1.6;margin-top:5px;}
+.di-acts{display:flex;gap:4px;flex-shrink:0;margin-top:2px;}
+
+/* ── TAGS ── */
+.tag{display:inline-flex;align-items:center;font-size:11px;padding:2px 8px;border-radius:10px;font-weight:600;white-space:nowrap;}
+.tg{background:rgba(201,168,76,.15);color:var(--gold);border:1px solid rgba(201,168,76,.3);}
+.tb{background:rgba(59,130,246,.15);color:#93C5FD;border:1px solid rgba(59,130,246,.25);}
+.tv{background:rgba(34,197,94,.15);color:#86EFAC;border:1px solid rgba(34,197,94,.25);}
+.tr{background:rgba(239,68,68,.15);color:#FCA5A5;border:1px solid rgba(239,68,68,.25);}
+.tp{background:rgba(168,85,247,.15);color:#D8B4FE;border:1px solid rgba(168,85,247,.25);}
+
+/* ── BUTTONS ── */
+.btn{padding:10px 16px;border-radius:10px;font-size:14px;cursor:pointer;border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-family:inherit;font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:6px;-webkit-appearance:none;min-height:44px;}
+.btn-gold{background:var(--gold);border-color:var(--gold);color:#000;}
+.btn-sm{padding:7px 13px;font-size:13px;min-height:36px;}
+.btn-red{border-color:rgba(239,68,68,.4);color:var(--red);background:rgba(239,68,68,.08);}
+.btn-green{border-color:rgba(34,197,94,.4);color:var(--green);background:rgba(34,197,94,.08);}
+.btn-full{width:100%;}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+
+/* ── INPUTS ── */
+input[type=text],input[type=number],input[type=url],input[type=date],input[type=email],textarea,select{
+  width:100%;background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:inherit;
+  font-size:16px;padding:12px 14px;border-radius:10px;outline:none;-webkit-appearance:none;
+  transition:border-color .15s;
+}
+input:focus,textarea:focus,select:focus{border-color:var(--gold);}
+textarea{resize:none;}
+select{cursor:pointer;background-image:none;}
+
+/* ── CHECKLIST ── */
+.ck-list{list-style:none;}
+.ck-item{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);font-size:14px;cursor:pointer;user-select:none;min-height:44px;}
+.ck-item:last-child{border-bottom:none;}
+.ck-box{width:22px;height:22px;border:2px solid var(--border2);border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:1px;transition:all .15s;}
+.ck-item.done .ck-box{background:var(--gold);border-color:var(--gold);}
+.ck-item.done>span{text-decoration:line-through;color:var(--text3);}
+.ck-chk{color:#000;font-size:12px;display:none;font-weight:700;}
+.ck-item.done .ck-chk{display:block;}
+
+/* ── SHEET / MODAL ── */
+.sheet-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;display:none;align-items:flex-end;}
+.sheet-overlay.open{display:flex;}
+.sheet{
+  width:100%;background:var(--bg2);border-radius:20px 20px 0 0;
+  border-top:1px solid var(--border2);
+  padding-bottom:var(--safe-bot);
+  max-height:92vh;display:flex;flex-direction:column;
+  animation:slideUp .25s ease;
+}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.sheet-handle{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:10px auto 0;}
+.sheet-hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 12px;border-bottom:1px solid var(--border);}
+.sheet-ttl{font-size:16px;font-weight:700;color:var(--gold);}
+.sheet-close{width:30px;height:30px;border-radius:50%;background:var(--bg4);border:none;color:var(--text2);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.sheet-body{padding:16px 20px;overflow-y:auto;flex:1;-webkit-overflow-scrolling:touch;}
+.sheet-foot{padding:12px 20px;border-top:1px solid var(--border);display:flex;gap:8px;}
+
+/* ── WEEK STRIP ── */
+.week-strip{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.week-strip::-webkit-scrollbar{display:none;}
+.wd{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:10px 12px;flex-shrink:0;cursor:pointer;min-width:80px;text-align:center;transition:border-color .15s;}
+.wd.active{border-color:var(--gold);background:rgba(201,168,76,.08);}
+.wd-e{font-size:20px;}
+.wd-n{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.4px;margin-top:3px;}
+.wd-f{font-size:11px;font-weight:600;color:var(--text2);margin-top:2px;white-space:nowrap;}
+
+/* ── CALENDAR ── */
+.cal-hdr{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:3px;}
+.cal-dhdr{text-align:center;font-size:10px;color:var(--text3);padding:4px 0;text-transform:uppercase;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
+.cal-d{background:var(--bg3);border:1px solid var(--border);border-radius:8px;min-height:52px;padding:5px;cursor:pointer;transition:border-color .12s;}
+.cal-d.today{border-color:var(--gold);background:rgba(201,168,76,.06);}
+.cal-d.hasit{border-color:rgba(201,168,76,.25);}
+.cal-d-n{font-size:11px;font-weight:600;color:var(--text2);margin-bottom:2px;}
+.cal-d.today .cal-d-n{color:var(--gold);}
+.cal-dot{width:5px;height:5px;border-radius:50%;background:var(--gold);display:inline-block;margin:1px;}
+
+/* ── HOME BANNER ── */
+.home-banner{background:linear-gradient(135deg,var(--bg2),var(--bg3));border:1px solid var(--border2);border-radius:16px;padding:20px;margin-bottom:14px;display:flex;align-items:center;gap:16px;}
+.home-logo{width:64px;height:64px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;color:#000;flex-shrink:0;overflow:hidden;border:2px solid var(--gold3);}
+.home-logo img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+
+/* ── INNER TABS ── */
+.itabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:14px;scrollbar-width:none;}
+.itabs::-webkit-scrollbar{display:none;}
+.itab{padding:8px 14px;font-size:12px;font-weight:600;border-radius:20px;cursor:pointer;color:var(--text2);background:var(--bg3);border:1px solid var(--border);white-space:nowrap;flex-shrink:0;min-height:36px;}
+.itab.active{background:var(--gold);border-color:var(--gold);color:#000;}
+.ipanel{display:none;}
+.ipanel.active{display:block;}
+
+/* ── FAB ── */
+.fab{
+  position:fixed;right:20px;
+  bottom:calc(var(--tab-h) + var(--safe-bot) + 16px);
+  width:54px;height:54px;border-radius:50%;
+  background:var(--gold);border:none;
+  display:flex;align-items:center;justify-content:center;
+  font-size:24px;cursor:pointer;z-index:150;
+  box-shadow:0 4px 20px rgba(201,168,76,.4);
+  color:#000;font-weight:700;
+}
+.fab.hidden{display:none;}
+
+/* ── EMPTY ── */
+.empty{text-align:center;padding:40px 20px;color:var(--text3);}
+.empty-ico{font-size:40px;margin-bottom:10px;}
+
+/* ── STATUS MSG ── */
+.sm{font-size:12px;padding:10px 13px;border-radius:8px;margin-top:8px;display:none;}
+.sok{background:rgba(34,197,94,.1);color:#86EFAC;border:1px solid rgba(34,197,94,.2);display:block;}
+.serr{background:rgba(239,68,68,.1);color:#FCA5A5;border:1px solid rgba(239,68,68,.2);display:block;}
+
+/* ── PROGRESS ── */
+.prog-wrap{background:var(--bg4);border-radius:20px;height:6px;overflow:hidden;}
+.prog-bar{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:20px;transition:width .3s;}
+
+/* ── MORE MENU ── */
+.more-menu{
+  position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.7);display:none;align-items:flex-end;
+}
+.more-menu.open{display:flex;}
+.more-menu-inner{width:100%;background:var(--bg2);border-radius:20px 20px 0 0;padding:12px 20px;padding-bottom:calc(var(--safe-bot) + 20px);}
+.more-item{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--border);font-size:15px;cursor:pointer;color:var(--text);user-select:none;}
+.more-item:last-child{border-bottom:none;}
+.more-item:active{opacity:.6;}
+.more-ico{font-size:20px;width:24px;text-align:center;}
+
+label{display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer;color:var(--text2);}
+label input[type=checkbox]{width:20px;height:20px;accent-color:var(--gold);}
+
+/* Prevent iOS bounce */
+.scroll-wrap{overscroll-behavior-y:contain;}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand-row" onclick="triggerLogo()">
+      <div class="brand-logo" id="topLogo">M</div>
+      <div class="brand-info">
+        <div class="name" id="topName">Imperio Mayde™</div>
+        <div class="slogan" id="topSlogan">Tu sistema de marca</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="save-dot" id="saveDot"></div>
+      <div class="icon-btn" onclick="openMoreMenu()">⋯</div>
+    </div>
+  </div>
+</div>
+
+<!-- SCROLL AREA -->
+<div class="scroll-wrap" id="scrollWrap">
+
+<!-- HOME -->
+<div id="page-home" class="page active">
+  <div class="home-banner">
+    <div class="home-logo" id="homeLogo" onclick="triggerLogo()">M</div>
+    <div style="flex:1;min-width:0;">
+      <div style="font-size:18px;font-weight:700;color:var(--gold);" id="hName">Imperio Mayde™</div>
+      <div style="font-size:12px;color:var(--text2);font-style:italic;margin-top:2px;" id="hSlogan">Agrega tu slogan</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:5px;line-height:1.5;" id="hPromise">Tu promesa de marca</div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:8px;" id="hPillars"></div>
+    </div>
+  </div>
+  <div class="metrics-grid">
+    <div class="mc"><div class="ml">Seguidores IG</div><div class="mv" id="hm-ig">0</div></div>
+    <div class="mc"><div class="ml">Pines activos</div><div class="mv" id="hm-pins">0</div></div>
+    <div class="mc"><div class="ml">Guiones</div><div class="mv" id="hm-sc">0</div></div>
+    <div class="mc"><div class="ml">Ideas</div><div class="mv" id="hm-id">0</div></div>
+  </div>
+  <div class="card">
+    <div class="card-hdr"><div class="card-ttl">✅ Hoy</div><button class="btn btn-sm btn-gold" onclick="openSheet('sh-task','')">+ Tarea</button></div>
+    <div id="hToday"><div style="color:var(--text3);font-size:13px;">Cargando...</div></div>
+  </div>
+  <div class="card">
+    <div class="card-hdr"><div class="card-ttl">📅 Esta semana</div></div>
+    <div id="hWeek"></div>
+  </div>
+</div>
+
+<!-- CALENDAR -->
+<div id="page-calendar" class="page">
+  <div class="card">
+    <div class="card-hdr">
+      <div class="card-ttl">📅 Calendario</div>
+      <div style="display:flex;gap:6px;">
+        <button class="btn btn-sm" onclick="calPrev()">←</button>
+        <span id="calLbl" style="font-size:13px;font-weight:700;color:var(--gold);padding:7px 8px;"></span>
+        <button class="btn btn-sm" onclick="calNext()">→</button>
+      </div>
+    </div>
+    <div class="cal-hdr" id="calHdr"></div>
+    <div class="cal-grid" id="calGrid"></div>
+  </div>
+  <div class="card">
+    <div class="card-hdr"><div class="card-ttl">📋 Plan semanal</div></div>
+    <div class="section-lbl">Semana activa</div>
+    <input type="date" id="weekStart" onchange="DB.weekStart=this.value;autosave();renderWeek();" style="margin-bottom:12px;font-size:14px;" />
+    <div class="week-strip" id="weekStrip"></div>
+    <div id="weekDetail" style="margin-top:12px;"></div>
+  </div>
+</div>
+
+<!-- CONTENT (ideas/scripts/carousels/stories) -->
+<div id="page-content" class="page">
+  <div class="itabs">
+    <div class="itab active" onclick="iTab('ct','ideas',this)">💡 Ideas</div>
+    <div class="itab" onclick="iTab('ct','scripts',this)">✍️ Guiones</div>
+    <div class="itab" onclick="iTab('ct','carousels',this)">🎠 Carruseles</div>
+    <div class="itab" onclick="iTab('ct','stories',this)">📱 Historias</div>
+  </div>
+  <div id="ct-ideas" class="ipanel active">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:12px;"><button class="btn btn-gold btn-sm" onclick="openSheet('sh-idea','')">+ Nueva idea</button></div>
+    <div id="ideasList"></div>
+  </div>
+  <div id="ct-scripts" class="ipanel">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:12px;"><button class="btn btn-gold btn-sm" onclick="openSheet('sh-script','')">+ Nuevo guión</button></div>
+    <div id="scriptsList"></div>
+  </div>
+  <div id="ct-carousels" class="ipanel">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:12px;"><button class="btn btn-gold btn-sm" onclick="openSheet('sh-car','')">+ Nuevo carrusel</button></div>
+    <div id="carList"></div>
+  </div>
+  <div id="ct-stories" class="ipanel">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:12px;"><button class="btn btn-gold btn-sm" onclick="openSheet('sh-story','')">+ Nueva historia</button></div>
+    <div id="storyList"></div>
+    <div class="btn-row"><button class="btn btn-full" onclick="exportStoriesWord()">📝 Exportar historias Word</button></div>
+  </div>
+</div>
+
+<!-- TASKS -->
+<div id="page-tasks" class="page">
+  <div class="card">
+    <div class="card-hdr"><div class="card-ttl">✅ Mis tareas</div></div>
+    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+      <select id="fDate" onchange="renderTasks()" style="flex:1;font-size:13px;padding:8px;">
+        <option value="">Todas las fechas</option>
+      </select>
+      <select id="fCat" onchange="renderTasks()" style="flex:1;font-size:13px;padding:8px;">
+        <option value="">Todas</option>
+        <option>Ideas</option><option>Guiones</option><option>Diseño</option>
+        <option>Grabación</option><option>Edición</option><option>Pinterest</option><option>Marca</option><option>General</option>
+      </select>
+    </div>
+    <div id="tasksList"></div>
+  </div>
+</div>
+
+<!-- PRODUCTION -->
+<div id="page-prod" class="page">
+  <div class="itabs">
+    <div class="itab active" onclick="iTab('pr','pre',this)">🎬 Pre-prod</div>
+    <div class="itab" onclick="iTab('pr','broll',this)">🎥 B-Roll</div>
+    <div class="itab" onclick="iTab('pr','edit',this)">✂️ Edición</div>
+    <div class="itab" onclick="iTab('pr','pint',this)">📌 Pinterest</div>
+  </div>
+  <div id="pr-pre" class="ipanel active">
+    <div class="card"><div class="card-hdr"><div class="card-ttl">🎬 Pre-grabación</div><button class="btn btn-sm" onclick="addCkItem('pre')">+</button></div><ul class="ck-list" id="ck-pre"></ul></div>
+  </div>
+  <div id="pr-broll" class="ipanel">
+    <div class="card"><div class="card-hdr"><div class="card-ttl">🎥 B-Roll</div><button class="btn btn-sm" onclick="addCkItem('broll')">+</button></div><ul class="ck-list" id="ck-broll"></ul></div>
+  </div>
+  <div id="pr-edit" class="ipanel">
+    <div class="card"><div class="card-hdr"><div class="card-ttl">✂️ Edición premium</div><button class="btn btn-sm" onclick="addCkItem('edit')">+</button></div><ul class="ck-list" id="ck-edit"></ul></div>
+  </div>
+  <div id="pr-pint" class="ipanel">
+    <div class="card"><div class="card-hdr"><div class="card-ttl">📌 Checklist Pinterest</div><button class="btn btn-sm" onclick="addCkItem('pint')">+</button></div><ul class="ck-list" id="ck-pint"></ul></div>
+  </div>
+</div>
+
+<!-- PINTEREST -->
+<div id="page-pinterest" class="page">
+  <div class="itabs">
+    <div class="itab active" onclick="iTab('pi','all',this)">Todos</div>
+    <div class="itab" onclick="iTab('pi','pend',this)">Pendientes</div>
+    <div class="itab" onclick="iTab('pi','pub',this)">Publicados</div>
+  </div>
+  <div id="pi-all" class="ipanel active"><div id="pinsAll"></div></div>
+  <div id="pi-pend" class="ipanel"><div id="pinsPend"></div></div>
+  <div id="pi-pub" class="ipanel"><div id="pinsPub"></div></div>
+</div>
+
+<!-- BRAND -->
+<div id="page-brand" class="page">
+  <div class="itabs">
+    <div class="itab active" onclick="iTab('br','id',this)">🌟 Identidad</div>
+    <div class="itab" onclick="iTab('br','voice',this)">🗣️ Voz</div>
+    <div class="itab" onclick="iTab('br','method',this)">⚡ Método</div>
+    <div class="itab" onclick="iTab('br','phases',this)">🚀 7 Fases</div>
+    <div class="itab" onclick="iTab('br','strategy',this)">📐 Estrategia</div>
+  </div>
+  <div id="br-id" class="ipanel active">
+    <div class="card">
+      <div class="section-lbl">Nombre de marca</div><input type="text" id="bName" placeholder="Imperio Mayde™" oninput="brandLive()"/>
+      <div class="section-lbl">Slogan</div><input type="text" id="bSlogan" placeholder="Tu slogan aquí..." oninput="brandLive()"/>
+      <div class="section-lbl">Visión</div><textarea id="bVision" rows="3" placeholder="¿Qué quieres lograr a largo plazo?..."></textarea>
+      <div class="section-lbl">Misión</div><textarea id="bMission" rows="3" placeholder="¿Cómo cumples tu visión?..."></textarea>
+      <div class="section-lbl">Propósito</div><textarea id="bPurpose" rows="2" placeholder="¿Por qué existe tu marca?..."></textarea>
+      <div class="section-lbl">🔑 Promesa de marca</div><textarea id="bPromise" rows="2" placeholder="La promesa que haces a tu cliente..." oninput="brandLive()"></textarea>
+      <div class="section-lbl">Manifiesto de marca</div><textarea id="bManifesto" rows="4" placeholder="Escribe tu manifiesto de marca..."></textarea>
+      <div class="section-lbl">Mensaje central</div><textarea id="bMessage" rows="2" placeholder="El mensaje más importante..."></textarea>
+      <div class="section-lbl">💎 Pilares de contenido</div>
+      <div id="pillarsList"></div>
+      <button class="btn btn-sm" onclick="addPillar()" style="margin-top:8px;">+ Pilar</button>
+      <div class="section-lbl">Cliente ideal / Avatar</div><textarea id="bAvatar" rows="3" placeholder="Edad, profesión, dolores, sueños..."></textarea>
+      <div class="section-lbl">Colores de marca</div><input type="text" id="bColors" placeholder="#C9A84C, #000000..."/>
+      <div class="section-lbl">Tipografías</div><input type="text" id="bFonts" placeholder="Playfair Display, Montserrat..."/>
+      <div class="btn-row"><button class="btn btn-gold btn-full" onclick="saveBrand()">💾 Guardar identidad</button></div>
+      <div id="brandSt" class="sm"></div>
+    </div>
+  </div>
+  <div id="br-voice" class="ipanel">
+    <div class="card">
+      <div class="section-lbl">Personalidad (palabras clave)</div><input type="text" id="bPersonality" placeholder="Auténtica, poderosa, directa..."/>
+      <div class="section-lbl">Tono de voz</div><textarea id="bTone" rows="3" placeholder="¿Cómo hablas? ¿Qué lenguaje usas?..."></textarea>
+      <div class="section-lbl">Propuesta de valor única</div><textarea id="bUVP" rows="3" placeholder="¿Qué problema único resuelves?..."></textarea>
+      <div class="section-lbl">Oferta premium</div><textarea id="bOffer" rows="3" placeholder="Producto/servicio, precio, transformación..."></textarea>
+      <div class="btn-row"><button class="btn btn-gold btn-full" onclick="saveVoice()">💾 Guardar</button></div>
+      <div id="voiceSt" class="sm"></div>
+    </div>
+  </div>
+  <div id="br-method" class="ipanel">
+    <div class="card">
+      <div class="card-ttl" style="margin-bottom:14px;">⚡ Método MAYDE™</div>
+      <div id="methodList"></div>
+      <button class="btn btn-sm" onclick="addMethod()" style="margin-top:8px;">+ Paso</button>
+      <div class="btn-row"><button class="btn btn-gold btn-full" onclick="saveMethod()">💾 Guardar método</button></div>
+      <div id="methodSt" class="sm"></div>
+    </div>
+  </div>
+  <div id="br-phases" class="ipanel">
+    <div id="phasesList"></div>
+    <div class="btn-row"><button class="btn btn-gold btn-full" onclick="savePhases()">💾 Guardar fases</button></div>
+    <div id="phasesSt" class="sm"></div>
+  </div>
+  <div id="br-strategy" class="ipanel">
+    <div class="card">
+      <div class="card-ttl" style="margin-bottom:14px;">📐 Estrategia por formato</div>
+      <div id="stratList"></div>
+      <button class="btn btn-sm" onclick="addStrat()" style="margin-top:8px;">+ Formato</button>
+      <div class="btn-row"><button class="btn btn-gold btn-full" onclick="saveStrat()">💾 Guardar</button></div>
+      <div id="stratSt" class="sm"></div>
+    </div>
+  </div>
+</div>
+
+<!-- METRICS -->
+<div id="page-metrics" class="page">
+  <div class="metrics-grid">
+    <div class="mc"><div class="ml">Seguidores IG</div><input class="mi" id="mIG" type="number" inputmode="numeric" value="0"/></div>
+    <div class="mc"><div class="ml">Alcance</div><input class="mi" id="mReach" type="number" inputmode="numeric" value="0"/></div>
+    <div class="mc"><div class="ml">Engagement %</div><input class="mi" id="mEng" type="number" inputmode="decimal" value="0"/></div>
+    <div class="mc"><div class="ml">Ventas</div><input class="mi" id="mSales" type="number" inputmode="numeric" value="0"/></div>
+    <div class="mc"><div class="ml">Visitas web</div><input class="mi" id="mWeb" type="number" inputmode="numeric" value="0"/></div>
+    <div class="mc"><div class="ml">Leads</div><input class="mi" id="mLeads" type="number" inputmode="numeric" value="0"/></div>
+    <div class="mc"><div class="ml">Impr. Pinterest</div><input class="mi" id="mPint" type="number" inputmode="numeric" value="0"/></div>
+    <div class="mc"><div class="ml">Videos pub.</div><input class="mi" id="mVid" type="number" inputmode="numeric" value="0"/></div>
+  </div>
+  <div class="btn-row"><button class="btn btn-gold btn-full" onclick="saveMetricRec()">📊 Guardar registro</button></div>
+  <div class="card" style="margin-top:12px;">
+    <div class="card-ttl" style="margin-bottom:12px;">📈 Historial</div>
+    <div id="metHist"></div>
+  </div>
+</div>
+
+<!-- BACKUP -->
+<div id="page-backup" class="page">
+  <div style="background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.3);border-radius:12px;padding:14px;margin-bottom:14px;font-size:13px;line-height:1.6;color:var(--text2);">
+    <strong style="color:var(--gold);">💡 Cómo funciona:</strong> Los datos se guardan automáticamente en tu iPhone (IndexedDB + localStorage). Exporta un JSON de respaldo cada semana para mayor seguridad.
+  </div>
+  <div class="card">
+    <div class="card-ttl" style="margin-bottom:14px;">📤 Exportar datos</div>
+    <select id="expFmt" style="margin-bottom:12px;font-size:14px;">
+      <option value="json">JSON — Backup completo</option>
+      <option value="csv">CSV — Excel/Sheets</option>
+      <option value="md">Markdown — Notion</option>
+    </select>
+    <div class="btn-row">
+      <button class="btn btn-gold btn-full" onclick="exportData()">⬇️ Exportar</button>
+      <button class="btn btn-full" onclick="exportReport()">📊 Informe mensual</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-ttl" style="margin-bottom:14px;">📥 Importar datos</div>
+    <textarea id="impArea" rows="6" placeholder='Pega aquí tu backup JSON...' style="font-size:13px;"></textarea>
+    <div class="btn-row">
+      <button class="btn btn-gold btn-full" onclick="importData()">⬆️ Importar</button>
+      <button class="btn btn-full" onclick="document.getElementById(&apos;fileIn&apos;).click()">📂 Archivo</button>
+      <input type="file" id="fileIn" style="display:none;" accept=".json,.txt" onchange="loadFile(event)"/>
+    </div>
+    <div id="impSt" class="sm"></div>
+  </div>
+  <div class="card">
+    <div class="card-ttl" style="margin-bottom:10px;">🗄️ Almacenamiento</div>
+    <div id="storageInfo" style="font-size:13px;color:var(--text2);line-height:1.8;"></div>
+    <div class="btn-row">
+      <button class="btn btn-full btn-red" onclick="clearAll()">🗑 Limpiar todo</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- /scroll-wrap -->
+
+<!-- FAB -->
+<button class="fab" id="fab" onclick="fabAction()">+</button>
+
+<!-- TAB BAR -->
+<div class="tabbar">
+  <div class="tabs">
+    <div class="tab active" onclick="navTo('home',this)" id="tab-home">
+      <div class="tab-ico">🏠</div><div class="tab-lbl">Inicio</div>
+    </div>
+    <div class="tab" onclick="navTo('calendar',this)" id="tab-calendar">
+      <div class="tab-ico">📅</div><div class="tab-lbl">Agenda</div>
+    </div>
+    <div class="tab" onclick="navTo('content',this)" id="tab-content">
+      <div class="tab-ico">✍️</div><div class="tab-lbl">Contenido</div>
+      <div class="tab-badge" id="nb-ct" style="display:none;">0</div>
+    </div>
+    <div class="tab" onclick="navTo('tasks',this)" id="tab-tasks">
+      <div class="tab-ico">✅</div><div class="tab-lbl">Tareas</div>
+      <div class="tab-badge" id="nb-tasks">0</div>
+    </div>
+    <div class="tab" onclick="navTo('prod',this)" id="tab-prod">
+      <div class="tab-ico">🎬</div><div class="tab-lbl">Prod.</div>
+    </div>
+    <div class="tab" onclick="navTo('pinterest',this)" id="tab-pinterest">
+      <div class="tab-ico">📌</div><div class="tab-lbl">Pins</div>
+      <div class="tab-badge" id="nb-pins">0</div>
+    </div>
+    <div class="tab" onclick="navTo('brand',this)" id="tab-brand">
+      <div class="tab-ico">👑</div><div class="tab-lbl">Marca</div>
+    </div>
+    <div class="tab" onclick="navTo('metrics',this)" id="tab-metrics">
+      <div class="tab-ico">📊</div><div class="tab-lbl">Métricas</div>
+    </div>
+  </div>
+</div>
+
+<!-- MORE MENU -->
+<div class="more-menu" id="moreMenu" onclick="if(event.target===this)closeMoreMenu()">
+  <div class="more-menu-inner">
+    <div style="width:36px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px;"></div>
+    <div class="more-item" onclick="closeMoreMenu();navTo('backup',null)"><span class="more-ico">💾</span>Backup y datos</div>
+    <div class="more-item" onclick="closeMoreMenu();triggerLogo()"><span class="more-ico">🖼️</span>Cambiar logo</div>
+    <div class="more-item" onclick="closeMoreMenu();forceSave()"><span class="more-ico">💾</span>Guardar ahora</div>
+    <div class="more-item" onclick="closeMoreMenu();showInstallTip()"><span class="more-ico">📲</span>Agregar al home screen</div>
+    <div class="more-item" onclick="closeMoreMenu();exportData()"><span class="more-ico">📤</span>Exportar JSON</div>
+    <div class="more-item" onclick="closeMoreMenu();exportReport()"><span class="more-ico">📊</span>Informe mensual</div>
+  </div>
+</div>
+
+<!-- SHEETS (Bottom sheets for add/edit) -->
+
+<!-- TASK SHEET -->
+<div class="sheet-overlay" id="sh-task">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-hdr"><div class="sheet-ttl" id="shTaskTtl">✅ Nueva tarea</div><button class="sheet-close" onclick="closeSheet('sh-task')">✕</button></div>
+    <div class="sheet-body">
+      <input type="hidden" id="tEid"/>
+      <div class="section-lbl">Título *</div><input type="text" id="tTitle" placeholder="Ej: Grabar Reel de marca personal..."/>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;">
+        <div><div class="section-lbl">Fecha</div><input type="date" id="tDate"/></div>
+        <div><div class="section-lbl">Prioridad</div><select id="tPrio"><option value="normal">Normal</option><option value="alta">Alta</option><option value="urgente">Urgente</option></select></div>
+      </div>
+      <div class="section-lbl">Categoría</div>
+      <select id="tCat"><option>General</option><option>Ideas</option><option>Guiones</option><option>Diseño</option><option>Grabación</option><option>Edición</option><option>Pinterest</option><option>Marca</option></select>
+      <div class="section-lbl">Hora</div><input type="text" id="tTime" placeholder="Ej: 9:00am — 11:00am"/>
+      <div class="section-lbl">Notas</div><textarea id="tDesc" rows="3" placeholder="Detalles..."></textarea>
+    </div>
+    <div class="sheet-foot"><button class="btn" onclick="closeSheet('sh-task')" style="flex:1;">Cancelar</button><button class="btn btn-gold" onclick="saveTask()" style="flex:2;">💾 Guardar</button></div>
+  </div>
+</div>
+
+<!-- IDEA SHEET -->
+<div class="sheet-overlay" id="sh-idea">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-hdr"><div class="sheet-ttl" id="shIdeaTtl">💡 Nueva idea</div><button class="sheet-close" onclick="closeSheet('sh-idea')">✕</button></div>
+    <div class="sheet-body">
+      <input type="hidden" id="iEid"/>
+      <div class="section-lbl">Idea *</div><input type="text" id="iText" placeholder="¿De qué trata el contenido?..."/>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;">
+        <div><div class="section-lbl">Categoría</div><select id="iCat"><option>Educativo</option><option>Entretenimiento</option><option>Inspiracional</option><option>Promocional</option><option>Detrás cámaras</option><option>Resultados</option></select></div>
+        <div><div class="section-lbl">Formato</div><select id="iFmt"><option>Reel IG</option><option>Carrusel</option><option>Story</option><option>TikTok</option><option>YouTube Short</option><option>Pin Pinterest</option></select></div>
+      </div>
+      <div class="section-lbl">Hook / gancho</div><input type="text" id="iHook" placeholder="La frase que detiene el scroll..."/>
+      <div class="section-lbl">Fecha programada</div><input type="date" id="iDate"/>
+      <div class="section-lbl">Notas</div><textarea id="iNotes" rows="2" placeholder="Referencias, recursos..."></textarea>
+    </div>
+    <div class="sheet-foot"><button class="btn" onclick="closeSheet('sh-idea')" style="flex:1;">Cancelar</button><button class="btn btn-gold" onclick="saveIdea()" style="flex:2;">💾 Guardar</button></div>
+  </div>
+</div>
+
+<!-- SCRIPT SHEET -->
+<div class="sheet-overlay" id="sh-script">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-hdr"><div class="sheet-ttl" id="shScTtl">✍️ Nuevo guión</div><button class="sheet-close" onclick="closeSheet('sh-script')">✕</button></div>
+    <div class="sheet-body">
+      <input type="hidden" id="scEid"/>
+      <div class="section-lbl">Título *</div><input type="text" id="scTitle" placeholder="Ej: 5 errores que frenan tu marca..."/>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;">
+        <div><div class="section-lbl">Fecha de grabación</div><input type="date" id="scDate"/></div>
+        <div><div class="section-lbl">Formato</div><select id="scFmt"><option>Reel IG</option><option>TikTok</option><option>YouTube Short</option><option>Story</option><option>Carrusel</option><option>Pin video</option></select></div>
+      </div>
+      <div class="section-lbl">🎯 HOOK (0-3 seg)</div><textarea id="scHook" rows="3" placeholder="Frase que detiene el scroll..."></textarea>
+      <div class="section-lbl">⚡ PROBLEMA (3-15 seg)</div><textarea id="scProb" rows="3" placeholder="Conecta con el dolor o deseo..."></textarea>
+      <div class="section-lbl">💡 CONTENIDO (15-45 seg)</div><textarea id="scCont" rows="3" placeholder="El valor real: tips, pasos..."></textarea>
+      <div class="section-lbl">📣 CTA (últimos 5 seg)</div><textarea id="scCTA" rows="2" placeholder="¿Qué debe hacer ahora?..."></textarea>
+      <div class="section-lbl">Notas de producción</div><textarea id="scNotes" rows="2" placeholder="B-roll, música, efectos..."></textarea>
+    </div>
+    <div class="sheet-foot"><button class="btn" onclick="closeSheet('sh-script')" style="flex:1;">Cancelar</button><button class="btn btn-gold" onclick="saveScript()" style="flex:2;">💾 Guardar</button></div>
+  </div>
+</div>
+
+<!-- SCRIPT VIEW SHEET -->
+<div class="sheet-overlay" id="sh-script-view">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-hdr"><div class="sheet-ttl" id="shScVTtl">✍️ Guión</div><button class="sheet-close" onclick="closeSheet('sh-script-view')">✕</button></div>
+    <div class="sheet-body" id="shScVBody"></div>
+    <div class="sheet-foot"><button class="btn btn-gold btn-full" onclick="closeSheet('sh-script-view')">Cerrar</button></div>
+  </div>
+</div>
+
+<!-- CAROUSEL SHEET -->
+<div class="sheet-overlay" id="sh-car">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-hdr"><div class="sheet-ttl" id="shCarTtl">🎠 Nuevo carrusel</div><button class="sheet-close" onclick="closeSheet('sh-car')">✕</button></div>
+    <div class="sheet-body">
+      <input type="hidden" id="carEid"/>
+      <div class="section-lbl">Tema *</div><input type="text" id="carTopic" placeholder="Ej: 5 errores de marca personal..."/>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;">
+        <div><div class="section-lbl">Fecha</div><input type="date" id="carDate"/></div>
+        <div><div class="section-lbl">Objetivo</div><input type="text" id="carGoal" placeholder="Ej: Generar guardados..."/></div>
+      </div>
+      <div class="section-lbl">Slides</div>
+      <div id="carSlidesWrap"></div>
+      <button class="btn btn-sm" onclick="addCarSlide()" style="margin-top:8px;">+ Slide</button>
+    </div>
+    <div class="sheet-foot"><button class="btn" onclick="closeSheet('sh-car')" style="flex:1;">Cancelar</button><button class="btn btn-gold" onclick="saveCarousel()" style="flex:2;">💾 Guardar</button></div>
+  </div>
+</div>
+
+<!-- STORY SHEET -->
+<div class="sheet-overlay" id="sh-story">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-hdr"><div class="sheet-ttl" id="shStTtl">📱 Nueva historia</div><button class="sheet-close" onclick="closeSheet('sh-story')">✕</button></div>
+    <div class="sheet-body">
+      <input type="hidden" id="stEid"/>
+      <div class="section-lbl">Tema *</div><input type="text" id="stTopic" placeholder="Ej: Detrás de cámaras..."/>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;">
+        <div><div class="section-lbl">Fecha</div><input type="date" id="stDate"/></div>
+        <div><div class="section-lbl">Tipo</div><select id="stType"><option>Educativa</option><option>Inspiracional</option><option>Detrás de cámaras</option><option>Promocional</option><option>Encuesta</option><option>Testimonios</option></select></div>
+      </div>
+      <div class="section-lbl">Secuencia (una por línea)</div><textarea id="stSeq" rows="5" placeholder="Story 1: Pregunta inicial&#10;Story 2: El contexto&#10;Story 3: El valor&#10;Story 4: CTA"></textarea>
+      <div class="section-lbl">Notas</div><textarea id="stNotes" rows="2" placeholder="Stickers, música, encuesta..."></textarea>
+    </div>
+    <div class="sheet-foot"><button class="btn" onclick="closeSheet('sh-story')" style="flex:1;">Cancelar</button><button class="btn btn-gold" onclick="saveStory()" style="flex:2;">💾 Guardar</button></div>
+  </div>
+</div>
+
+<!-- PIN SHEET -->
+<div class="sheet-overlay" id="sh-pin">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-hdr"><div class="sheet-ttl" id="shPinTtl">📌 Nuevo pin</div><button class="sheet-close" onclick="closeSheet('sh-pin')">✕</button></div>
+    <div class="sheet-body">
+      <input type="hidden" id="pinEid"/>
+      <div class="section-lbl">Título (incluye keyword) *</div><input type="text" id="pinTitle" placeholder="Máx. 100 caracteres..."/>
+      <div class="section-lbl">Descripción SEO</div><textarea id="pinDesc" rows="3" placeholder="Máx. 500 caracteres con keywords..."></textarea>
+      <div class="section-lbl">URL de destino</div><input type="url" id="pinUrl" placeholder="https://..." inputmode="url"/>
+      <div class="section-lbl">Tablero</div><input type="text" id="pinBoard" placeholder="Ej: Marca Personal Premium"/>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;">
+        <div><div class="section-lbl">Formato</div><select id="pinFmt"><option>Pin estático</option><option>Pin de video</option><option>Pin idea</option></select></div>
+        <div><div class="section-lbl">Fecha</div><input type="date" id="pinDate"/></div>
+      </div>
+      <div class="section-lbl">Estado</div>
+      <select id="pinStatus"><option value="pendiente">Pendiente</option><option value="programado">Programado</option><option value="publicado">Publicado</option></select>
+    </div>
+    <div class="sheet-foot">
+      <button class="btn btn-green" onclick="pinToP()" style="flex:1;">📌 Pinterest</button>
+      <button class="btn btn-gold" onclick="savePin()" style="flex:2;">💾 Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- INSTALL TIP SHEET -->
+<div class="sheet-overlay" id="sh-install">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-hdr"><div class="sheet-ttl">📲 Agregar al Home Screen</div><button class="sheet-close" onclick="closeSheet('sh-install')">✕</button></div>
+    <div class="sheet-body">
+      <div style="text-align:center;padding:10px 0 20px;">
+        <div style="font-size:48px;margin-bottom:14px;">📱</div>
+        <div style="font-size:15px;font-weight:700;color:var(--gold);margin-bottom:12px;">Instala Imperio Mayde™ como app</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:12px;padding:16px;margin-bottom:10px;">
+        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px;">En Safari (iPhone):</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.7;">1. Toca el botón <strong style="color:var(--gold);">Compartir</strong> (□↑) en la barra inferior<br>2. Desplaza hacia abajo y toca <strong style="color:var(--gold);">"Agregar a pantalla de inicio"</strong><br>3. Toca <strong style="color:var(--gold);">"Agregar"</strong><br>4. ¡Listo! Verás el ícono en tu pantalla</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:12px;padding:16px;">
+        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px;">En Edge (iPhone):</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.7;">1. Toca el menú <strong style="color:var(--gold);">⋯</strong> abajo<br>2. Toca <strong style="color:var(--gold);">"Agregar a pantalla de inicio"</strong></div>
+      </div>
+    </div>
+    <div class="sheet-foot"><button class="btn btn-gold btn-full" onclick="closeSheet('sh-install')">✓ Entendido</button></div>
+  </div>
+</div>
+
+<input type="file" id="logoInput" style="display:none;" accept="image/*" onchange="handleLogo(event)"/>
+
+<script>
+// ====================================================
+// STORAGE — same robust engine as desktop version
+// ====================================================
+const SK='IM_DB_v4';
+let idb=null,isDirty=false,saveTimer=null;
+
+function defaultDB(){return{brand:{name:'Imperio Mayde™',slogan:'',vision:'',mission:'',purpose:'',promise:'',manifesto:'',message:'',pillars:[],avatar:'',colors:'',fonts:'',personality:'',tone:'',uvp:'',offer:'',methodSteps:[],phases:Array.from({length:7},(_,i)=>({phase:i+1,title:'Fase '+(i+1),desc:'',actions:''})),contentFormats:[]},tasks:[],ideas:[],scripts:[],carousels:[],stories:[],pins:[],metrics:[],checklists:{pre:[],broll:[],edit:[],pint:[]},weekStart:'',logo:'',mIG:0,mReach:0,mEng:0,mSales:0,mWeb:0,mLeads:0,mPint:0,mVid:0};}
+
+function mergeDB(d){
+  if(!d)return defaultDB();
+  const def=defaultDB();
+  d.brand=Object.assign({},def.brand,d.brand||{});
+  ['pillars','methodSteps','contentFormats'].forEach(k=>{if(!Array.isArray(d.brand[k]))d.brand[k]=[];});
+  if(!Array.isArray(d.brand.phases)||d.brand.phases.length<7)d.brand.phases=def.brand.phases;
+  d.checklists=Object.assign({},def.checklists,d.checklists||{});
+  ['tasks','ideas','scripts','carousels','stories','pins','metrics'].forEach(k=>{if(!Array.isArray(d[k]))d[k]=[];});
+  ['mIG','mReach','mEng','mSales','mWeb','mLeads','mPint','mVid'].forEach(k=>{if(typeof d[k]!=='number')d[k]=0;});
+  if(typeof d.weekStart!=='string')d.weekStart='';
+  if(typeof d.logo!=='string')d.logo='';
+  return d;
+}
+function readLS(){try{const r=localStorage.getItem(SK);if(!r)return null;const p=JSON.parse(r);const lo=localStorage.getItem(SK+'_logo');if(lo&&!p.logo)p.logo=lo;return p;}catch(e){return null;}}
+let DB=mergeDB(readLS());
+
+function openIDB(){return new Promise(res=>{try{const req=indexedDB.open('ImperioMayde',2);req.onupgradeneeded=e=>{if(!e.target.result.objectStoreNames.contains('data'))e.target.result.createObjectStore('data');};req.onsuccess=e=>res(e.target.result);req.onerror=()=>res(null);}catch(e){res(null);}});}
+async function readIDB(){if(!idb)return null;return new Promise(res=>{try{const req=idb.transaction('data','readonly').objectStore('data').get(SK);req.onsuccess=()=>{try{res(req.result?JSON.parse(req.result):null);}catch(e){res(null);}};req.onerror=()=>res(null);}catch(e){res(null);}});}
+async function writeIDB(d){if(!idb)return;try{const tx=idb.transaction('data','readwrite');tx.objectStore('data').put(JSON.stringify(d),SK);}catch(e){}}
+function writeLS(d){try{const s=JSON.stringify(d);if(s.length>4500000){const d2={...d,logo:''};localStorage.setItem(SK,JSON.stringify(d2));if(d.logo)localStorage.setItem(SK+'_logo',d.logo);}else localStorage.setItem(SK,s);}catch(e){try{localStorage.setItem(SK,JSON.stringify({...d,logo:''}));}catch(e2){}}}
+async function saveData(){setSaveDot('busy');writeLS(DB);await writeIDB(DB);setSaveDot('ok');isDirty=false;}
+function autosave(){isDirty=true;setSaveDot('busy');clearTimeout(saveTimer);saveTimer=setTimeout(saveData,800);}
+function forceSave(){clearTimeout(saveTimer);saveData().then(()=>toast('✓ Guardado'));}
+function setSaveDot(s){const d=document.getElementById('saveDot');if(d)d.className='save-dot'+(s==='ok'?' ok':s==='busy'?' busy':'');}
+
+// ====================================================
+// UTILS
+// ====================================================
+function uid(){return Date.now().toString(36)+Math.random().toString(36).substr(2,5);}
+function esc(s){return s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'):''; }
+function fd(d){if(!d)return'';const p=d.split('-');return`${p[2]}/${p[1]}/${p[0]}`;}
+function toast(msg){let t=document.getElementById('_t');if(!t){t=document.createElement('div');t.id='_t';t.style.cssText='position:fixed;top:calc(var(--safe-top) + 70px);left:50%;transform:translateX(-50%);background:var(--gold);color:#000;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:700;z-index:9999;transition:opacity .3s;white-space:nowrap;pointer-events:none;';document.body.appendChild(t);}t.textContent=msg;t.style.opacity='1';clearTimeout(t._t);t._t=setTimeout(()=>t.style.opacity='0',2200);}
+function showSt(id,msg,cls){const el=document.getElementById(id);if(!el)return;el.textContent=msg;el.className='sm '+cls;setTimeout(()=>el.className='sm',4000);}
+
+// ====================================================
+// NAV
+// ====================================================
+let curPage='home';
+const FAB_PAGES={home:null,calendar:'mod-cal-task',content:'content',tasks:'sh-task',prod:null,pinterest:'sh-pin',brand:null,metrics:null,backup:null};
+function navTo(id,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  if(el)el.classList.add('active');
+  else{const t=document.getElementById('tab-'+id);if(t)t.classList.add('active');}
+  document.getElementById('scrollWrap').scrollTop=0;
+  curPage=id;
+  // FAB
+  const fab=document.getElementById('fab');
+  if(id==='home'||id==='brand'||id==='metrics'||id==='backup'||id==='prod'){fab.classList.add('hidden');}
+  else{fab.classList.remove('hidden');}
+  if(id==='backup')updateStorageInfo();
+}
+function fabAction(){
+  if(curPage==='tasks')openSheet('sh-task','');
+  else if(curPage==='content'){
+    const activeItab=document.querySelector('#page-content .itab.active');
+    const label=activeItab?activeItab.textContent.trim():'';
+    if(label.includes('Ideas'))openSheet('sh-idea','');
+    else if(label.includes('Guiones'))openSheet('sh-script','');
+    else if(label.includes('Carruseles'))openSheet('sh-car','');
+    else if(label.includes('Historias'))openSheet('sh-story','');
+    else openSheet('sh-idea','');
+  }
+  else if(curPage==='pinterest')openSheet('sh-pin','');
+  else if(curPage==='calendar')openSheet('sh-task','');
+}
+function iTab(g,id,el){
+  document.querySelectorAll('[id^="'+g+'-"]').forEach(p=>{if(p.classList.contains('ipanel'))p.classList.remove('active');});
+  document.getElementById(g+'-'+id).classList.add('active');
+  if(el){el.parentElement.querySelectorAll('.itab').forEach(t=>t.classList.remove('active'));el.classList.add('active');}
+}
+
+// ====================================================
+// SHEET / MODAL
+// ====================================================
+function openSheet(id,editId){
+  if(id==='sh-task')prepTask(editId);
+  else if(id==='sh-idea')prepIdea(editId);
+  else if(id==='sh-script')prepScript(editId);
+  else if(id==='sh-car')prepCar(editId);
+  else if(id==='sh-story')prepStory(editId);
+  else if(id==='sh-pin')prepPin(editId);
+  document.getElementById(id).classList.add('open');
+}
+function closeSheet(id){document.getElementById(id).classList.remove('open');}
+// Close on overlay tap
+document.addEventListener('click',e=>{if(e.target.classList.contains('sheet-overlay'))e.target.classList.remove('open');if(e.target.classList.contains('more-menu'))e.target.classList.remove('open');});
+
+// ====================================================
+// MORE MENU
+// ====================================================
+function openMoreMenu(){document.getElementById('moreMenu').classList.add('open');}
+function closeMoreMenu(){document.getElementById('moreMenu').classList.remove('open');}
+function showInstallTip(){openSheet('sh-install','');}
+
+// ====================================================
+// BADGES & HOME
+// ====================================================
+function updateBadges(){
+  const b=(id,n,hide0=false)=>{const el=document.getElementById(id);if(!el)return;el.textContent=n;el.style.display=(hide0&&n===0)?'none':'';};
+  b('nb-tasks',DB.tasks.filter(t=>!t.done).length);
+  b('nb-pins',DB.pins.length,true);
+  const ct=DB.ideas.length+DB.scripts.length+DB.carousels.length+DB.stories.length;
+  b('nb-ct',ct,true);
+}
+function updateHomeMetrics(){
+  const s=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  s('hm-ig',(DB.mIG||0).toLocaleString());s('hm-pins',DB.pins.length);s('hm-sc',DB.scripts.length);s('hm-id',DB.ideas.length);
+}
+function renderHomePillars(){
+  const el=document.getElementById('hPillars');if(!el)return;
+  el.innerHTML=(DB.brand.pillars||[]).map(p=>`<span class="tag tg">${esc(p.name||p)}</span>`).join('');
+}
+function renderHomeWeek(){
+  const el=document.getElementById('hWeek');if(!el)return;
+  const WD=[{n:'Lunes',e:'💡',f:'Ideas'},{n:'Martes',e:'✍️',f:'Guiones'},{n:'Miérc.',e:'🎠',f:'Diseño'},{n:'Jueves',e:'🎬',f:'Grabación'},{n:'Viernes',e:'✂️',f:'Edición'},{n:'Sábado',e:'📌',f:'Pinterest'},{n:'Domingo',e:'📊',f:'Métricas'}];
+  el.innerHTML=WD.map(d=>`<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);font-size:14px;" onclick="navTo('calendar',document.getElementById('tab-calendar'))">${d.e} <span style="color:var(--text2);min-width:60px;">${d.n}</span><span style="color:var(--gold);font-size:12px;">${d.f}</span></div>`).join('');
+}
+function renderHomeToday(){
+  const el=document.getElementById('hToday');if(!el)return;
+  const today=new Date().toISOString().split('T')[0];
+  const tasks=DB.tasks.filter(t=>t.date===today&&!t.done);
+  if(!tasks.length){el.innerHTML='<div style="color:var(--text3);font-size:13px;padding:8px 0;">Sin tareas pendientes hoy 🎉</div>';return;}
+  el.innerHTML=tasks.slice(0,5).map(t=>`<div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);font-size:14px;" onclick="toggleTask('${t.id}');renderHomeToday()"><div class="ck-box" style="${t.done?'background:var(--gold);border-color:var(--gold);':''}flex-shrink:0;"><span class="ck-chk" ${t.done?'':'style="display:none;"'}>✓</span></div><span>${esc(t.title)}</span><span class="tag tb" style="margin-left:auto;">${t.cat}</span></div>`).join('');
+}
+
+// ====================================================
+// BRAND
+// ====================================================
+function loadBrandFields(){
+  const b=DB.brand;
+  const map={bName:'name',bSlogan:'slogan',bVision:'vision',bMission:'mission',bPurpose:'purpose',bPromise:'promise',bManifesto:'manifesto',bMessage:'message',bAvatar:'avatar',bColors:'colors',bFonts:'fonts',bPersonality:'personality',bTone:'tone',bUVP:'uvp',bOffer:'offer'};
+  Object.entries(map).forEach(([id,k])=>{const e=document.getElementById(id);if(e&&b[k]!==undefined)e.value=b[k];});
+}
+function brandLive(){
+  const n=document.getElementById('bName').value||'Imperio Mayde™';
+  const s=document.getElementById('bSlogan').value;
+  const p=document.getElementById('bPromise').value;
+  document.getElementById('hName').textContent=n;
+  document.getElementById('topName').textContent=n;
+  document.getElementById('hSlogan').textContent=s||'Agrega tu slogan';
+  document.getElementById('topSlogan').textContent=s||'Tu sistema de marca';
+  document.getElementById('hPromise').textContent=p||'Tu promesa de marca';
+  document.getElementById('sbName') && (document.getElementById('sbName').textContent=n);
+}
+function saveBrand(show=true){
+  const map={bName:'name',bSlogan:'slogan',bVision:'vision',bMission:'mission',bPurpose:'purpose',bPromise:'promise',bManifesto:'manifesto',bMessage:'message',bAvatar:'avatar',bColors:'colors',bFonts:'fonts'};
+  Object.entries(map).forEach(([id,k])=>{const e=document.getElementById(id);if(e)DB.brand[k]=e.value;});
+  autosave();brandLive();renderHomePillars();
+  if(show){showSt('brandSt','✓ Identidad guardada','sok');toast('✓ Marca guardada');}
+}
+function saveVoice(){
+  DB.brand.personality=document.getElementById('bPersonality').value;
+  DB.brand.tone=document.getElementById('bTone').value;
+  DB.brand.uvp=document.getElementById('bUVP').value;
+  DB.brand.offer=document.getElementById('bOffer').value;
+  autosave();showSt('voiceSt','✓ Guardado','sok');toast('✓ Guardado');
+}
+function renderPillars(){
+  const el=document.getElementById('pillarsList');if(!el)return;
+  el.innerHTML=(DB.brand.pillars||[]).map((p,i)=>`
+    <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center;">
+      <input type="text" value="${esc(p.name||p)}" oninput="DB.brand.pillars[${i}].name=this.value;autosave();" placeholder="Nombre del pilar..." style="flex:1;font-size:14px;"/>
+      <button class="btn btn-sm btn-red" onclick="DB.brand.pillars.splice(${i},1);autosave();renderPillars();">✕</button>
+    </div>`).join('');
+}
+function addPillar(){DB.brand.pillars.push({name:'',desc:''});autosave();renderPillars();}
+function renderMethod(){
+  const el=document.getElementById('methodList');if(!el)return;
+  el.innerHTML=(DB.brand.methodSteps||[]).map((s,i)=>`
+    <div style="background:var(--bg3);border-radius:10px;padding:12px;margin-bottom:10px;">
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
+        <span class="tag tg">${i+1}</span>
+        <input type="text" value="${esc(s.title||'')}" oninput="DB.brand.methodSteps[${i}].title=this.value;autosave();" placeholder="Nombre del paso..." style="flex:1;font-size:14px;"/>
+        <button class="btn btn-sm btn-red" onclick="DB.brand.methodSteps.splice(${i},1);autosave();renderMethod();">✕</button>
+      </div>
+      <textarea rows="2" oninput="DB.brand.methodSteps[${i}].desc=this.value;autosave();" placeholder="Descripción..." style="font-size:13px;">${esc(s.desc||'')}</textarea>
+    </div>`).join('');
+}
+function addMethod(){DB.brand.methodSteps.push({title:'',desc:''});autosave();renderMethod();}
+function saveMethod(){autosave();showSt('methodSt','✓ Guardado','sok');toast('✓ Guardado');}
+function renderPhases(){
+  const el=document.getElementById('phasesList');if(!el)return;
+  el.innerHTML=(DB.brand.phases||[]).map((ph,i)=>`
+    <div class="card" style="margin-bottom:10px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <span class="tag tg" style="font-size:12px;padding:4px 10px;">Fase ${ph.phase}</span>
+        <input type="text" value="${esc(ph.title)}" oninput="DB.brand.phases[${i}].title=this.value;autosave();" placeholder="Título..." style="flex:1;font-size:14px;"/>
+      </div>
+      <textarea rows="2" oninput="DB.brand.phases[${i}].desc=this.value;autosave();" placeholder="Descripción..." style="margin-bottom:8px;font-size:13px;">${esc(ph.desc||'')}</textarea>
+      <textarea rows="2" oninput="DB.brand.phases[${i}].actions=this.value;autosave();" placeholder="Acciones concretas..." style="font-size:13px;">${esc(ph.actions||'')}</textarea>
+    </div>`).join('');
+}
+function savePhases(){autosave();showSt('phasesSt','✓ Guardado','sok');toast('✓ Guardado');}
+function renderStrat(){
+  const el=document.getElementById('stratList');if(!el)return;
+  el.innerHTML=(DB.brand.contentFormats||[]).map((f,i)=>`
+    <div style="background:var(--bg3);border-radius:10px;padding:12px;margin-bottom:10px;">
+      <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center;">
+        <input type="text" value="${esc(f.format||'')}" oninput="DB.brand.contentFormats[${i}].format=this.value;autosave();" placeholder="Formato..." style="flex:1;font-size:14px;"/>
+        <button class="btn btn-sm btn-red" onclick="DB.brand.contentFormats.splice(${i},1);autosave();renderStrat();">✕</button>
+      </div>
+      <input type="text" value="${esc(f.freq||'')}" oninput="DB.brand.contentFormats[${i}].freq=this.value;autosave();" placeholder="Frecuencia (ej: 3x/semana)" style="margin-bottom:8px;font-size:13px;"/>
+      <input type="text" value="${esc(f.goal||'')}" oninput="DB.brand.contentFormats[${i}].goal=this.value;autosave();" placeholder="Objetivo principal..." style="font-size:13px;"/>
+    </div>`).join('');
+}
+function addStrat(){DB.brand.contentFormats.push({format:'',freq:'',goal:''});autosave();renderStrat();}
+function saveStrat(){autosave();showSt('stratSt','✓ Guardado','sok');toast('✓ Guardado');}
+
+// ====================================================
+// LOGO
+// ====================================================
+function triggerLogo(){document.getElementById('logoInput').click();}
+function handleLogo(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{DB.logo=ev.target.result;autosave();renderLogo();};
+  r.readAsDataURL(f);
+}
+function renderLogo(){
+  if(!DB.logo)return;
+  ['topLogo','homeLogo'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=`<img src="${DB.logo}"/>`;});
+}
+
+// ====================================================
+// TASKS
+// ====================================================
+const WDAYS=[{n:'Lunes',e:'💡',f:'Generación de ideas'},{n:'Martes',e:'✍️',f:'Guiones & Copywriting'},{n:'Miércoles',e:'🎠',f:'Diseño & Carruseles'},{n:'Jueves',e:'🎬',f:'Grabación'},{n:'Viernes',e:'✂️',f:'Edición & Publicación'},{n:'Sábado',e:'📌',f:'Pinterest & SEO'},{n:'Domingo',e:'📊',f:'Métricas & Estrategia'}];
+const DTASKS=[['Revisar tendencias en TikTok, Instagram y Pinterest','Listar 10 ideas para la semana','Definir hooks para cada idea','Investigar keywords para SEO','Revisar métricas de la semana anterior'],['Escribir guiones de 1-3 videos','Redactar captions con CTAs','Crear textos de carruseles','Escribir títulos y descripciones de pines','Preparar stories guionizadas'],['Diseñar 1-2 carruseles en Canva','Crear pines estáticos (mín. 5)','Diseñar portadas de video','Preparar plantillas de stories','Verificar consistencia visual'],['Preparar set: iluminación, fondo, audio','Grabar video o Reel principal','Grabar b-roll: manos, lifestyle, detalles','Grabación de stories del día','Revisar material grabado'],['Editar video: cortes, color, subtítulos','Insertar b-roll en puntos clave','Agregar intro/outro con logo','Publicar o programar contenido','Subir 5-8 pines a Pinterest'],['Publicar 3-5 pines en diferentes tableros','Repinear contenido evergreen propio','Optimizar descripciones de tableros','Analizar qué pines generan más tráfico','Crear pines de video'],['Revisar analytics completos','Medir engagement y crecimiento','Identificar qué contenido funcionó mejor','Documentar aprendizajes','Planificar metas de la siguiente semana']];
+let activeWD=0;
+
+function prepTask(id=''){
+  document.getElementById('shTaskTtl').textContent=id?'✏️ Editar tarea':'✅ Nueva tarea';
+  document.getElementById('tEid').value=id;
+  if(id){const t=DB.tasks.find(x=>x.id===id);if(t){document.getElementById('tTitle').value=t.title||'';document.getElementById('tDate').value=t.date||'';document.getElementById('tCat').value=t.cat||'General';document.getElementById('tTime').value=t.time||'';document.getElementById('tDesc').value=t.desc||'';document.getElementById('tPrio').value=t.prio||'normal';}}
+  else{['tTitle','tTime','tDesc'].forEach(i=>document.getElementById(i).value='');document.getElementById('tDate').value=new Date().toISOString().split('T')[0];document.getElementById('tCat').value='General';document.getElementById('tPrio').value='normal';}
+}
+function saveTask(){
+  const id=document.getElementById('tEid').value;
+  const t={id:id||uid(),title:document.getElementById('tTitle').value.trim(),date:document.getElementById('tDate').value,cat:document.getElementById('tCat').value,time:document.getElementById('tTime').value,desc:document.getElementById('tDesc').value,prio:document.getElementById('tPrio').value,done:false};
+  if(!t.title){toast('Escribe un título');return;}
+  if(id){const i=DB.tasks.findIndex(x=>x.id===id);if(i>=0){t.done=DB.tasks[i].done;DB.tasks[i]=t;}}else DB.tasks.push(t);
+  autosave();closeSheet('sh-task');renderTasks();updateBadges();updateCal();renderHomeToday();
+}
+function toggleTask(id){const t=DB.tasks.find(x=>x.id===id);if(!t)return;t.done=!t.done;autosave();renderTasks();updateBadges();}
+function renderTasks(){
+  const fD=document.getElementById('fDate').value;
+  const fC=document.getElementById('fCat').value;
+  let list=[...DB.tasks];
+  if(fD)list=list.filter(t=>t.date===fD);
+  if(fC)list=list.filter(t=>t.cat===fC);
+  list.sort((a,b)=>a.date.localeCompare(b.date));
+  const el=document.getElementById('tasksList');
+  if(!list.length){el.innerHTML='<div class="empty"><div class="empty-ico">✅</div><div>Sin tareas. Toca + para agregar.</div></div>';return;}
+  const pTag={alta:'tg',urgente:'tr',normal:'tb'};
+  el.innerHTML=list.map(t=>`
+    <div class="di" style="${t.done?'opacity:.5;':''}">
+      <div class="di-hdr">
+        <div style="display:flex;align-items:flex-start;gap:12px;flex:1;">
+          <div class="ck-box" onclick="toggleTask('${t.id}')" style="${t.done?'background:var(--gold);border-color:var(--gold);':''}cursor:pointer;flex-shrink:0;margin-top:2px;">
+            ${t.done?'<span class="ck-chk">✓</span>':''}
+          </div>
+          <div style="flex:1;min-width:0;">
+            <div class="di-ttl" style="${t.done?'text-decoration:line-through;color:var(--text3);':''}">${esc(t.title)}</div>
+            <div class="di-meta">
+              ${t.date?`<span class="tag tb">📅 ${fd(t.date)}</span>`:''}
+              ${t.time?`<span class="tag tb">🕐 ${esc(t.time)}</span>`:''}
+              <span class="tag ${pTag[t.prio]||'tb'}">${t.cat}</span>
+              ${t.prio!=='normal'?`<span class="tag tr">${t.prio}</span>`:''}
+            </div>
+            ${t.desc?`<div class="di-body">${esc(t.desc)}</div>`:''}
+          </div>
+        </div>
+        <div class="di-acts">
+          <button class="btn btn-sm" onclick="openSheet('sh-task','${t.id}')">✏️</button>
+          <button class="btn btn-sm btn-red" onclick="del('tasks','${t.id}',renderTasks)">🗑</button>
+        </div>
+      </div>
+    </div>`).join('');
+  const allD=[...new Set(DB.tasks.map(t=>t.date).filter(Boolean))].sort();
+  const sel=document.getElementById('fDate');const cur=sel.value;
+  sel.innerHTML='<option value="">Todas las fechas</option>'+allD.map(d=>`<option value="${d}" ${d===cur?'selected':''}>${fd(d)}</option>`).join('');
+}
+
+// ====================================================
+// IDEAS
+// ====================================================
+function prepIdea(id=''){
+  document.getElementById('shIdeaTtl').textContent=id?'✏️ Editar idea':'💡 Nueva idea';
+  document.getElementById('iEid').value=id;
+  if(id){const x=DB.ideas.find(i=>i.id===id);if(x){document.getElementById('iText').value=x.text||'';document.getElementById('iCat').value=x.cat||'Educativo';document.getElementById('iFmt').value=x.fmt||'Reel IG';document.getElementById('iHook').value=x.hook||'';document.getElementById('iDate').value=x.date||'';document.getElementById('iNotes').value=x.notes||'';}}
+  else{['iText','iHook','iNotes'].forEach(i=>document.getElementById(i).value='');document.getElementById('iDate').value='';document.getElementById('iCat').value='Educativo';document.getElementById('iFmt').value='Reel IG';}
+}
+function saveIdea(){
+  const id=document.getElementById('iEid').value;
+  const item={id:id||uid(),text:document.getElementById('iText').value.trim(),cat:document.getElementById('iCat').value,fmt:document.getElementById('iFmt').value,hook:document.getElementById('iHook').value,date:document.getElementById('iDate').value,notes:document.getElementById('iNotes').value};
+  if(!item.text){toast('Escribe la idea');return;}
+  if(id){const i=DB.ideas.findIndex(x=>x.id===id);if(i>=0)DB.ideas[i]=item;}else DB.ideas.push(item);
+  autosave();closeSheet('sh-idea');renderIdeas();updateBadges();updateHomeMetrics();
+}
+function renderIdeas(){
+  const el=document.getElementById('ideasList');
+  if(!DB.ideas.length){el.innerHTML='<div class="empty"><div class="empty-ico">💡</div><div>Sin ideas. Toca + para agregar.</div></div>';return;}
+  el.innerHTML=DB.ideas.map(x=>`
+    <div class="di">
+      <div class="di-hdr">
+        <div style="flex:1;min-width:0;">
+          <div class="di-ttl">${esc(x.text)}</div>
+          <div class="di-meta">${x.date?`<span class="tag tp">📅 ${fd(x.date)}</span>`:''}<span class="tag tg">${x.cat}</span><span class="tag tb">${x.fmt}</span></div>
+          ${x.hook?`<div class="di-body" style="color:var(--gold);">🎯 ${esc(x.hook)}</div>`:''}
+          ${x.notes?`<div class="di-body">${esc(x.notes)}</div>`:''}
+        </div>
+        <div class="di-acts">
+          <button class="btn btn-sm" onclick="openSheet('sh-idea','${x.id}')">✏️</button>
+          <button class="btn btn-sm btn-red" onclick="del('ideas','${x.id}',renderIdeas)">🗑</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+// ====================================================
+// SCRIPTS
+// ====================================================
+function prepScript(id=''){
+  document.getElementById('shScTtl').textContent=id?'✏️ Editar guión':'✍️ Nuevo guión';
+  document.getElementById('scEid').value=id;
+  if(id){const x=DB.scripts.find(s=>s.id===id);if(x){document.getElementById('scTitle').value=x.title||'';document.getElementById('scDate').value=x.date||'';document.getElementById('scFmt').value=x.fmt||'Reel IG';document.getElementById('scHook').value=x.hook||'';document.getElementById('scProb').value=x.prob||'';document.getElementById('scCont').value=x.cont||'';document.getElementById('scCTA').value=x.cta||'';document.getElementById('scNotes').value=x.notes||'';}}
+  else{['scTitle','scHook','scProb','scCont','scCTA','scNotes'].forEach(i=>document.getElementById(i).value='');document.getElementById('scDate').value='';document.getElementById('scFmt').value='Reel IG';}
+}
+function saveScript(){
+  const id=document.getElementById('scEid').value;
+  const item={id:id||uid(),title:document.getElementById('scTitle').value.trim(),date:document.getElementById('scDate').value,fmt:document.getElementById('scFmt').value,hook:document.getElementById('scHook').value,prob:document.getElementById('scProb').value,cont:document.getElementById('scCont').value,cta:document.getElementById('scCTA').value,notes:document.getElementById('scNotes').value};
+  if(!item.title){toast('Escribe el título');return;}
+  if(id){const i=DB.scripts.findIndex(x=>x.id===id);if(i>=0)DB.scripts[i]=item;}else DB.scripts.push(item);
+  autosave();closeSheet('sh-script');renderScripts();updateBadges();updateCal();updateHomeMetrics();
+}
+function viewScript(id){
+  const x=DB.scripts.find(s=>s.id===id);if(!x)return;
+  document.getElementById('shScVTtl').textContent='✍️ '+x.title;
+  document.getElementById('shScVBody').innerHTML=`
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;">${x.date?`<span class="tag tg">📅 ${fd(x.date)}</span>`:''}<span class="tag tb">${x.fmt}</span></div>
+    ${x.hook?`<div class="card" style="margin-bottom:10px;"><div style="font-size:10px;color:var(--gold);font-weight:700;letter-spacing:1px;margin-bottom:6px;">🎯 HOOK — 0 a 3 seg</div><div style="font-size:15px;line-height:1.7;">${esc(x.hook)}</div></div>`:''}
+    ${x.prob?`<div class="card" style="margin-bottom:10px;"><div style="font-size:10px;color:var(--gold);font-weight:700;letter-spacing:1px;margin-bottom:6px;">⚡ PROBLEMA — 3 a 15 seg</div><div style="font-size:15px;line-height:1.7;">${esc(x.prob)}</div></div>`:''}
+    ${x.cont?`<div class="card" style="margin-bottom:10px;"><div style="font-size:10px;color:var(--gold);font-weight:700;letter-spacing:1px;margin-bottom:6px;">💡 CONTENIDO — 15 a 45 seg</div><div style="font-size:15px;line-height:1.7;">${esc(x.cont)}</div></div>`:''}
+    ${x.cta?`<div class="card" style="margin-bottom:10px;"><div style="font-size:10px;color:var(--gold);font-weight:700;letter-spacing:1px;margin-bottom:6px;">📣 CTA — últimos 5 seg</div><div style="font-size:15px;line-height:1.7;">${esc(x.cta)}</div></div>`:''}
+    ${x.notes?`<div class="card"><div style="font-size:10px;color:var(--text3);font-weight:700;letter-spacing:1px;margin-bottom:6px;">📝 NOTAS DE PRODUCCIÓN</div><div style="font-size:14px;color:var(--text2);line-height:1.7;">${esc(x.notes)}</div></div>`:''}
+    <div style="display:flex;gap:8px;margin-top:14px;">
+      <button class="btn btn-full" onclick="openSheet('sh-script','${x.id}');closeSheet('sh-script-view')">✏️ Editar</button>
+    </div>`;
+  document.getElementById('sh-script-view').classList.add('open');
+}
+function renderScripts(){
+  const el=document.getElementById('scriptsList');
+  if(!DB.scripts.length){el.innerHTML='<div class="empty"><div class="empty-ico">✍️</div><div>Sin guiones. Toca + para crear.</div></div>';return;}
+  const sorted=[...DB.scripts].sort((a,b)=>a.date.localeCompare(b.date));
+  el.innerHTML=sorted.map(x=>`
+    <div class="di">
+      <div class="di-hdr">
+        <div style="flex:1;min-width:0;" onclick="viewScript('${x.id}')">
+          <div class="di-ttl">${esc(x.title)}</div>
+          <div class="di-meta"><span class="tag tb">${x.fmt}</span>${x.date?`<span class="tag tg">📅 ${fd(x.date)}</span>`:''}</div>
+          ${x.hook?`<div class="di-body" style="font-style:italic;">"${esc(x.hook.substring(0,70))}..."</div>`:''}
+        </div>
+        <div class="di-acts">
+          <button class="btn btn-sm" onclick="viewScript('${x.id}')">👁</button>
+          <button class="btn btn-sm btn-red" onclick="del('scripts','${x.id}',renderScripts)">🗑</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+// ====================================================
+// CAROUSELS
+// ====================================================
+let carN=0;
+function prepCar(id=''){
+  document.getElementById('shCarTtl').textContent=id?'✏️ Editar carrusel':'🎠 Nuevo carrusel';
+  document.getElementById('carEid').value=id;
+  document.getElementById('carSlidesWrap').innerHTML='';carN=0;
+  if(id){const x=DB.carousels.find(c=>c.id===id);if(x){document.getElementById('carTopic').value=x.topic||'';document.getElementById('carDate').value=x.date||'';document.getElementById('carGoal').value=x.goal||'';(x.slides||[]).forEach(s=>{carN++;addCarSlideVal(s);});}}
+  else{['carTopic','carDate','carGoal'].forEach(i=>document.getElementById(i).value='');for(let i=0;i<3;i++){carN++;addCarSlideVal('');}}
+}
+function addCarSlide(){carN++;addCarSlideVal('');}
+function addCarSlideVal(v=''){
+  const n=carN;const d=document.createElement('div');
+  d.style.cssText='display:flex;gap:8px;margin-bottom:10px;align-items:center;';
+  d.innerHTML=`<span class="tag tg" style="min-width:50px;justify-content:center;flex-shrink:0;font-size:12px;">S${n}</span><input type="text" value="${esc(v)}" placeholder="Contenido del slide..." style="flex:1;font-size:14px;"/><button class="btn btn-sm btn-red" onclick="this.parentElement.remove()">✕</button>`;
+  document.getElementById('carSlidesWrap').appendChild(d);
+}
+function saveCarousel(){
+  const id=document.getElementById('carEid').value;
+  const slides=[...document.querySelectorAll('#carSlidesWrap input[type=text]')].map(i=>i.value).filter(v=>v);
+  const item={id:id||uid(),topic:document.getElementById('carTopic').value.trim(),date:document.getElementById('carDate').value,goal:document.getElementById('carGoal').value,slides};
+  if(!item.topic){toast('Escribe el tema');return;}
+  if(id){const i=DB.carousels.findIndex(x=>x.id===id);if(i>=0)DB.carousels[i]=item;}else DB.carousels.push(item);
+  autosave();closeSheet('sh-car');renderCarousels();updateBadges();
+}
+function renderCarousels(){
+  const el=document.getElementById('carList');
+  if(!DB.carousels.length){el.innerHTML='<div class="empty"><div class="empty-ico">🎠</div><div>Sin carruseles. Toca + para crear.</div></div>';return;}
+  el.innerHTML=DB.carousels.map(x=>`
+    <div class="di">
+      <div class="di-hdr">
+        <div style="flex:1;min-width:0;">
+          <div class="di-ttl">${esc(x.topic)}</div>
+          <div class="di-meta">${x.date?`<span class="tag tg">📅 ${fd(x.date)}</span>`:''}<span class="tag tb">${(x.slides||[]).length} slides</span>${x.goal?`<span class="tag tp">${esc(x.goal)}</span>`:''}</div>
+          <div style="margin-top:7px;display:flex;gap:5px;flex-wrap:wrap;">${(x.slides||[]).slice(0,4).map((s,i)=>`<span class="tag tb" style="font-size:10px;">S${i+1}: ${esc(s.substring(0,18))}...</span>`).join('')}</div>
+        </div>
+        <div class="di-acts">
+          <button class="btn btn-sm" onclick="openSheet('sh-car','${x.id}')">✏️</button>
+          <button class="btn btn-sm btn-red" onclick="del('carousels','${x.id}',renderCarousels)">🗑</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+// ====================================================
+// STORIES
+// ====================================================
+function prepStory(id=''){
+  document.getElementById('shStTtl').textContent=id?'✏️ Editar historia':'📱 Nueva historia';
+  document.getElementById('stEid').value=id;
+  if(id){const x=DB.stories.find(s=>s.id===id);if(x){document.getElementById('stTopic').value=x.topic||'';document.getElementById('stDate').value=x.date||'';document.getElementById('stType').value=x.type||'Educativa';document.getElementById('stSeq').value=x.seq||'';document.getElementById('stNotes').value=x.notes||'';}}
+  else{['stTopic','stSeq','stNotes'].forEach(i=>document.getElementById(i).value='');document.getElementById('stDate').value='';document.getElementById('stType').value='Educativa';}
+}
+function saveStory(){
+  const id=document.getElementById('stEid').value;
+  const item={id:id||uid(),topic:document.getElementById('stTopic').value.trim(),date:document.getElementById('stDate').value,type:document.getElementById('stType').value,seq:document.getElementById('stSeq').value,notes:document.getElementById('stNotes').value};
+  if(!item.topic){toast('Escribe el tema');return;}
+  if(id){const i=DB.stories.findIndex(x=>x.id===id);if(i>=0)DB.stories[i]=item;}else DB.stories.push(item);
+  autosave();closeSheet('sh-story');renderStories();updateBadges();
+}
+function renderStories(){
+  const el=document.getElementById('storyList');
+  if(!DB.stories.length){el.innerHTML='<div class="empty"><div class="empty-ico">📱</div><div>Sin historias planificadas.</div></div>';return;}
+  el.innerHTML=[...DB.stories].sort((a,b)=>a.date.localeCompare(b.date)).map(x=>`
+    <div class="di">
+      <div class="di-hdr">
+        <div style="flex:1;min-width:0;">
+          <div class="di-ttl">${esc(x.topic)}</div>
+          <div class="di-meta">${x.date?`<span class="tag tg">📅 ${fd(x.date)}</span>`:''}<span class="tag tp">${x.type}</span></div>
+          ${x.seq?`<div class="di-body" style="white-space:pre-line;">${esc(x.seq)}</div>`:''}
+        </div>
+        <div class="di-acts">
+          <button class="btn btn-sm" onclick="openSheet('sh-story','${x.id}')">✏️</button>
+          <button class="btn btn-sm btn-red" onclick="del('stories','${x.id}',renderStories)">🗑</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+// ====================================================
+// PINS
+// ====================================================
+function prepPin(id=''){
+  document.getElementById('shPinTtl').textContent=id?'✏️ Editar pin':'📌 Nuevo pin';
+  document.getElementById('pinEid').value=id;
+  if(id){const x=DB.pins.find(p=>p.id===id);if(x){document.getElementById('pinTitle').value=x.title||'';document.getElementById('pinDesc').value=x.desc||'';document.getElementById('pinUrl').value=x.url||'';document.getElementById('pinBoard').value=x.board||'';document.getElementById('pinFmt').value=x.fmt||'Pin estático';document.getElementById('pinDate').value=x.date||'';document.getElementById('pinStatus').value=x.status||'pendiente';}}
+  else{['pinTitle','pinDesc','pinUrl','pinBoard'].forEach(i=>document.getElementById(i).value='');document.getElementById('pinDate').value='';document.getElementById('pinFmt').value='Pin estático';document.getElementById('pinStatus').value='pendiente';}
+}
+function savePin(){
+  const id=document.getElementById('pinEid').value;
+  const item={id:id||uid(),title:document.getElementById('pinTitle').value.trim(),desc:document.getElementById('pinDesc').value,url:document.getElementById('pinUrl').value,board:document.getElementById('pinBoard').value,fmt:document.getElementById('pinFmt').value,date:document.getElementById('pinDate').value,status:document.getElementById('pinStatus').value};
+  if(!item.title){toast('Escribe el título');return;}
+  if(id){const i=DB.pins.findIndex(x=>x.id===id);if(i>=0)DB.pins[i]=item;}else DB.pins.push(item);
+  autosave();closeSheet('sh-pin');renderPins();updateBadges();updateHomeMetrics();
+}
+function pinToP(){
+  const t=document.getElementById('pinTitle').value;
+  const d=document.getElementById('pinDesc').value;
+  const u=document.getElementById('pinUrl').value;
+  window.open('https://pinterest.com/pin/create/button/?url='+encodeURIComponent(u||location.href)+'&description='+encodeURIComponent((t?t+' — ':'')+d),'_blank');
+}
+function cyclePinStatus(id){const p=DB.pins.find(x=>x.id===id);if(!p)return;const st=['pendiente','programado','publicado'];p.status=st[(st.indexOf(p.status)+1)%st.length];autosave();renderPins();}
+function renderPins(){
+  const em={'Pin estático':'🖼️','Pin de video':'🎥','Pin idea (carrusel)':'🎠'};
+  const sc={'pendiente':'tg','programado':'tb','publicado':'tv'};
+  const rl=(list,elId)=>{
+    const el=document.getElementById(elId);if(!el)return;
+    if(!list.length){el.innerHTML='<div class="empty"><div class="empty-ico">📌</div><div>Sin pines aquí.</div></div>';return;}
+    el.innerHTML=list.map(x=>`
+      <div class="di">
+        <div class="di-hdr">
+          <div style="display:flex;gap:10px;flex:1;min-width:0;">
+            <span style="font-size:22px;flex-shrink:0;">${em[x.fmt]||'📌'}</span>
+            <div style="flex:1;min-width:0;">
+              <div class="di-ttl">${esc(x.title)}</div>
+              <div class="di-meta">
+                ${x.date?`<span class="tag tb">📅 ${fd(x.date)}</span>`:''}
+                <span class="tag ${sc[x.status]||'tg'}" onclick="cyclePinStatus('${x.id}')" style="cursor:pointer;">${x.status}</span>
+                ${x.board?`<span class="tag tp">${esc(x.board)}</span>`:''}
+              </div>
+              ${x.desc?`<div class="di-body">${esc(x.desc.substring(0,80))}...</div>`:''}
+            </div>
+          </div>
+          <div class="di-acts">
+            <button class="btn btn-sm btn-green" onclick="window.open('https://pinterest.com/pin/create/button/?url='+encodeURIComponent('${esc(x.url||'')}')+'&description='+encodeURIComponent('${esc(x.title||'')}'),'_blank')">📌</button>
+            <button class="btn btn-sm" onclick="openSheet('sh-pin','${x.id}')">✏️</button>
+            <button class="btn btn-sm btn-red" onclick="del('pins','${x.id}',renderPins)">🗑</button>
+          </div>
+        </div>
+      </div>`).join('');
+  };
+  rl(DB.pins,'pinsAll');rl(DB.pins.filter(p=>p.status==='pendiente'),'pinsPend');rl(DB.pins.filter(p=>p.status==='publicado'),'pinsPub');
+}
+
+// ====================================================
+// CHECKLISTS
+// ====================================================
+const DEF_CK={pre:['Guión listo y ensayado mínimo 3 veces','Iluminación: luz natural o ring light frontal','Fondo: limpio y coherente con la marca','Audio: micrófono conectado y probado','Cámara: limpia, enfocada, 4K o 1080p','Outfit coherente con la marca','Batería 100% y almacenamiento disponible','Modo avión activado'],broll:['Manos escribiendo en laptop o agenda','Pantalla mostrando trabajo en proceso','Lifestyle: café, agenda, objetos de marca','Toma de perfil caminando','Flat lay desde arriba con props de marca','Detalle del producto o servicio','Behind the scenes de creación','Close-up facial: reacciones auténticas'],edit:['Cortar silencios y tomas fallidas','Agregar subtítulos','Música de fondo acorde a la marca','Transiciones y efectos de marca','Corrección de color: look premium','Insertar b-roll en momentos clave','Intro/outro con logo de Imperio Mayde','Exportar: 9:16 para Reels/TikTok'],pint:['Publicar 5-10 pines por semana','Imágenes verticales 2:3 (1000x1500px)','Keywords en título, descripción e imagen','Repinear contenido evergreen propio','Optimizar descripciones de tableros','Revisar analytics semanalmente','Publicar 8-11am y 7-10pm']};
+function initCK(){['pre','broll','edit','pint'].forEach(k=>{if(!DB.checklists[k]||!DB.checklists[k].length)DB.checklists[k]=DEF_CK[k].map(t=>({id:uid(),text:t,done:false}));});}
+function renderCK(key,elId){
+  const el=document.getElementById(elId);if(!el)return;
+  const items=DB.checklists[key]||[];
+  el.innerHTML=items.map((t,i)=>`
+    <li class="ck-item ${t.done?'done':''}" onclick="toggleCK('${key}',${i})">
+      <div class="ck-box"><span class="ck-chk">✓</span></div>
+      <span style="flex:1;">${esc(t.text)}</span>
+      <button class="btn btn-sm btn-red" style="padding:4px 8px;margin-left:8px;" onclick="event.stopPropagation();DB.checklists['${key}'].splice(${i},1);autosave();renderAllCK()">✕</button>
+    </li>`).join('');
+}
+function toggleCK(key,i){DB.checklists[key][i].done=!DB.checklists[key][i].done;autosave();renderAllCK();}
+function addCkItem(key){const text=prompt('Nueva tarea:');if(!text)return;DB.checklists[key].push({id:uid(),text,done:false});autosave();renderAllCK();}
+function renderAllCK(){renderCK('pre','ck-pre');renderCK('broll','ck-broll');renderCK('edit','ck-edit');renderCK('pint','ck-pint');}
+
+// ====================================================
+// CALENDAR
+// ====================================================
+let calY=new Date().getFullYear(),calM=new Date().getMonth();
+const MN=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const DN=['D','L','M','X','J','V','S'];
+function calPrev(){calM--;if(calM<0){calM=11;calY--;}renderCal();}
+function calNext(){calM++;if(calM>11){calM=0;calY++;}renderCal();}
+function renderCal(){
+  document.getElementById('calLbl').textContent=MN[calM]+' '+calY;
+  document.getElementById('calHdr').innerHTML=DN.map(d=>`<div class="cal-dhdr">${d}</div>`).join('');
+  const first=new Date(calY,calM,1).getDay();
+  const days=new Date(calY,calM+1,0).getDate();
+  const today=new Date();
+  let html='';
+  for(let i=0;i<first;i++)html+=`<div class="cal-d" style="opacity:.15;min-height:52px;"></div>`;
+  for(let d=1;d<=days;d++){
+    const ds=`${calY}-${String(calM+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const tasks=DB.tasks.filter(t=>t.date===ds);
+    const sc=DB.scripts.filter(s=>s.date===ds);
+    const pins=DB.pins.filter(p=>p.date===ds);
+    const isT=today.getFullYear()===calY&&today.getMonth()===calM&&today.getDate()===d;
+    const has=tasks.length||sc.length||pins.length;
+    html+=`<div class="cal-d ${isT?'today':''} ${has?'hasit':''}" onclick="calClick('${ds}')">
+      <div class="cal-d-n">${d}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:2px;">${tasks.slice(0,2).map(()=>'<div class="cal-dot"></div>').join('')}${sc.length?'<div class="cal-dot" style="background:#A855F7;"></div>':''}${pins.length?'<div class="cal-dot" style="background:#EF4444;"></div>':''}</div>
+    </div>`;
+  }
+  document.getElementById('calGrid').innerHTML=html;
+  renderWeek();
+}
+function calClick(date){document.getElementById('tDate').value=date;openSheet('sh-task','');}
+function updateCal(){if(document.getElementById('calGrid'))renderCal();}
+
+// WEEK
+function renderWeek(){
+  const strip=document.getElementById('weekStrip');if(!strip)return;
+  strip.innerHTML=WDAYS.map((d,i)=>`<div class="wd ${i===activeWD?'active':''}" onclick="selectWD(${i})"><div class="wd-e">${d.e}</div><div class="wd-n">${d.n}</div><div class="wd-f">${d.f}</div></div>`).join('');
+  renderWeekDetail(activeWD);
+}
+function selectWD(i){activeWD=i;renderWeek();}
+function getWD(i){const ws=document.getElementById('weekStart').value;if(!ws)return'';const d=new Date(ws);d.setDate(d.getDate()+i);return d.toISOString().split('T')[0];}
+function renderWeekDetail(i){
+  const el=document.getElementById('weekDetail');if(!el)return;
+  const d=WDAYS[i];const wd=getWD(i);
+  const myT=wd?DB.tasks.filter(t=>t.date===wd):[];
+  el.innerHTML=`<div class="card"><div class="card-hdr"><div class="card-ttl" style="font-size:14px;">${d.e} ${d.n} — ${d.f}</div><button class="btn btn-sm btn-gold" onclick="document.getElementById('tDate').value='${wd}';openSheet('sh-task','')">+ Tarea</button></div>
+    <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;">Plan sugerido</div>
+    <ul class="ck-list">${DTASKS[i].map(t=>`<li class="ck-item" onclick="this.classList.toggle('done')"><div class="ck-box"><span class="ck-chk">✓</span></div><span>${t}</span></li>`).join('')}</ul>
+    ${myT.length?`<div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin:14px 0 8px;">Mis tareas</div>${myT.map(t=>`<div class="di" style="padding:10px 12px;margin-bottom:6px;${t.done?'opacity:.5;':''}"><div style="display:flex;align-items:center;gap:10px;"><div class="ck-box" onclick="toggleTask('${t.id}');renderWeek()" style="${t.done?'background:var(--gold);border-color:var(--gold);':''}cursor:pointer;">${t.done?'<span class="ck-chk">✓</span>':''}</div><span style="${t.done?'text-decoration:line-through;color:var(--text3);':''}font-size:14px;flex:1;">${esc(t.title)}</span><span class="tag tb">${t.cat}</span></div></div>`).join('')}`:''}
+  </div>`;
+}
+
+// ====================================================
+// METRICS
+// ====================================================
+function saveMetricRec(){
+  const rec={date:new Date().toLocaleDateString('es'),ig:+document.getElementById('mIG').value||0,reach:+document.getElementById('mReach').value||0,eng:+document.getElementById('mEng').value||0,sales:+document.getElementById('mSales').value||0,web:+document.getElementById('mWeb').value||0,leads:+document.getElementById('mLeads').value||0,pint:+document.getElementById('mPint').value||0,vid:+document.getElementById('mVid').value||0};
+  DB.metrics.push(rec);DB.mIG=rec.ig;autosave();renderMetHist();updateHomeMetrics();toast('✓ Métricas guardadas');
+}
+function renderMetHist(){
+  const el=document.getElementById('metHist');if(!el)return;
+  if(!DB.metrics.length){el.innerHTML='<div class="empty"><div class="empty-ico">📊</div><div>Sin registros aún.</div></div>';return;}
+  el.innerHTML=[...DB.metrics].reverse().map(r=>`
+    <div class="di" style="margin-bottom:8px;">
+      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+        <span class="tag tg">📅 ${r.date}</span>
+        <span class="tag tb">👥 ${r.ig}</span>
+        <span class="tag tv">💬 ${r.eng}%</span>
+        <span class="tag tg">💰 ${r.sales}</span>
+        <button class="btn btn-sm btn-red" style="margin-left:auto;padding:4px 8px;" onclick="DB.metrics.splice(DB.metrics.findIndex(x=>x.date==='${r.date}'),1);autosave();renderMetHist()">🗑</button>
+      </div>
+    </div>`).join('');
+}
+
+// ====================================================
+// DELETE
+// ====================================================
+function del(col,id,fn){
+  if(!confirm('¿Eliminar?'))return;
+  DB[col]=DB[col].filter(x=>x.id!==id);
+  autosave();fn();updateBadges();updateHomeMetrics();updateCal();
+}
+
+// ====================================================
+// EXPORT / IMPORT
+// ====================================================
+function exportData(){
+  const fmt=document.getElementById('expFmt').value;
+  const data={brand_name:DB.brand.name,export_date:new Date().toISOString(),ideas:DB.ideas,scripts:DB.scripts,carousels:DB.carousels,stories:DB.stories,pins:DB.pins,tasks:DB.tasks,metrics:DB.metrics,brand:DB.brand,checklists:DB.checklists};
+  let c,t,x;
+  if(fmt==='json'){c=JSON.stringify(data,null,2);t='application/json';x='json';}
+  else if(fmt==='csv'){c='seccion,datos\n'+Object.entries(data).map(([k,v])=>`${k},"${JSON.stringify(v).replace(/"/g,'""')}"`).join('\n');t='text/csv';x='csv';}
+  else{c=`# Imperio Mayde™\n## Ideas\n${(data.ideas||[]).map(i=>`- **${i.text}** | ${i.fmt}`).join('\n')}\n## Guiones\n${(data.scripts||[]).map(s=>`### ${s.title}\n- Hook: ${s.hook||'—'}`).join('\n\n')}\n## Marca\n- Visión: ${data.brand.vision||'—'}\n- Misión: ${data.brand.mission||'—'}`;t='text/markdown';x='md';}
+  const b=new Blob([c],{type:t});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`im-backup-${new Date().toISOString().split('T')[0]}.${x}`;a.click();toast('✓ Exportado');
+}
+function importData(){
+  try{
+    const raw=document.getElementById('impArea').value.trim();if(!raw){showSt('impSt','Pega datos primero','serr');return;}
+    const p=JSON.parse(raw);
+    if(p.ideas)DB.ideas=[...DB.ideas,...p.ideas.filter(n=>!DB.ideas.find(e=>e.id===n.id))];
+    if(p.scripts)DB.scripts=[...DB.scripts,...p.scripts.filter(n=>!DB.scripts.find(e=>e.id===n.id))];
+    if(p.pins)DB.pins=[...DB.pins,...p.pins.filter(n=>!DB.pins.find(e=>e.id===n.id))];
+    if(p.tasks)DB.tasks=[...DB.tasks,...p.tasks.filter(n=>!DB.tasks.find(e=>e.id===n.id))];
+    if(p.carousels)DB.carousels=[...DB.carousels,...p.carousels.filter(n=>!DB.carousels.find(e=>e.id===n.id))];
+    if(p.stories)DB.stories=[...DB.stories,...p.stories.filter(n=>!DB.stories.find(e=>e.id===n.id))];
+    if(p.metrics)DB.metrics=[...DB.metrics,...p.metrics];
+    if(p.brand)DB.brand={...DB.brand,...p.brand};
+    if(p.checklists)DB.checklists={...DB.checklists,...p.checklists};
+    autosave();renderAll();loadBrandFields();brandLive();
+    showSt('impSt','✓ Datos importados correctamente','sok');toast('✓ Importación exitosa');
+  }catch(e){showSt('impSt','✗ JSON inválido. Verifica el formato.','serr');}
+}
+function loadFile(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{document.getElementById('impArea').value=ev.target.result;showSt('impSt','Archivo cargado. Presiona Importar.','sok');};r.readAsText(f);}
+function clearAll(){if(!confirm('¿Borrar TODOS los datos?'))return;if(!confirm('¿Segura? No se puede deshacer.'))return;DB=defaultDB();autosave();renderAll();loadBrandFields();brandLive();toast('Datos eliminados');}
+function exportStoriesWord(){
+  let html='<html><head><meta charset="UTF-8"><style>body{font-family:Arial;}h1{color:#C9A84C;}th{background:#C9A84C;color:#000;}td,th{padding:8px;border:1px solid #ccc;}table{border-collapse:collapse;width:100%;}</style></head><body>';
+  html+=`<h1>Imperio Mayde™ — Plan de Historias</h1><p>${new Date().toLocaleDateString('es')}</p>`;
+  html+='<table><tr><th>#</th><th>Tema</th><th>Fecha</th><th>Tipo</th><th>Secuencia</th></tr>';
+  DB.stories.forEach((s,i)=>{html+=`<tr><td>${i+1}</td><td><b>${s.topic}</b></td><td>${s.date?fd(s.date):''}</td><td>${s.type}</td><td style="white-space:pre-line;">${s.seq||''}</td></tr>`;});
+  html+='</table></body></html>';
+  const b=new Blob([html],{type:'application/msword'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='historias-im.doc';a.click();toast('✓ Word descargado');
+}
+function exportReport(){
+  let c='IMPERIO MAYDE™ — INFORME MENSUAL\n'+new Date().toLocaleDateString('es')+'\n\n';
+  c+='MÉTRICAS:\n';
+  if(DB.metrics.length){const l=DB.metrics[DB.metrics.length-1];c+=`IG: ${l.ig} seguidores | Alcance: ${l.reach} | Engagement: ${l.eng}%\nVentas: ${l.sales} | Leads: ${l.leads} | Pinterest: ${l.pint} impr.\n`;}
+  c+=`\nCONTENIDO:\nIdeas: ${DB.ideas.length} | Guiones: ${DB.scripts.length} | Carruseles: ${DB.carousels.length} | Historias: ${DB.stories.length}\n`;
+  c+=`\nPINTEREST:\nTotal: ${DB.pins.length} | Publicados: ${DB.pins.filter(p=>p.status==='publicado').length} | Pendientes: ${DB.pins.filter(p=>p.status==='pendiente').length}\n`;
+  c+=`\nTAREAS:\nTotal: ${DB.tasks.length} | Completadas: ${DB.tasks.filter(t=>t.done).length} | Pendientes: ${DB.tasks.filter(t=>!t.done).length}\n`;
+  c+='\nIDEAS:\n'+DB.ideas.map((x,i)=>`${i+1}. [${x.cat}] ${x.text}`).join('\n');
+  const b=new Blob([c],{type:'text/plain'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='informe-im.txt';a.click();toast('✓ Informe descargado');
+}
+function updateStorageInfo(){
+  const el=document.getElementById('storageInfo');if(!el)return;
+  const kb=(JSON.stringify(DB).length/1024).toFixed(1);
+  el.innerHTML=`<div>📦 Datos: <strong style="color:var(--gold);">${kb} KB</strong></div><div>🗄️ IndexedDB: <strong style="color:var(--green);">${idb?'✓ Activo':'Sin acceso'}</strong></div><div>💾 localStorage: <strong style="color:var(--green);">${readLS()?'✓ Activo':'Sin acceso'}</strong></div><div>📊 ${DB.tasks.length} tareas · ${DB.ideas.length} ideas · ${DB.scripts.length} guiones · ${DB.pins.length} pines</div>`;
+}
+
+// ====================================================
+// RENDER ALL
+// ====================================================
+function renderAll(){
+  renderIdeas();renderScripts();renderCarousels();renderStories();renderPins();
+  renderTasks();renderMetHist();renderAllCK();
+  renderPillars();renderMethod();renderPhases();renderStrat();
+  updateBadges();updateHomeMetrics();renderCal();renderHomeWeek();renderHomeToday();renderHomePillars();
+}
+
+// ====================================================
+// INIT
+// ====================================================
+function applyDBToUI(){
+  initCK();loadBrandFields();brandLive();renderLogo();
+  const ws=DB.weekStart||new Date().toISOString().split('T')[0];
+  document.getElementById('weekStart').value=ws;
+  ['mIG','mReach','mEng','mSales','mWeb','mLeads','mPint','mVid'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=DB[id]||0;});
+  renderAll();
+}
+
+async function init(){
+  applyDBToUI();
+  setSaveDot('ok');
+  try{
+    idb=await openIDB();
+    const idbData=await readIDB();
+    if(idbData){
+      const m=mergeDB(idbData);
+      const iScore=(m.tasks||[]).length+(m.ideas||[]).length+(m.scripts||[]).length+(m.pins||[]).length;
+      const lScore=(DB.tasks||[]).length+(DB.ideas||[]).length+(DB.scripts||[]).length+(DB.pins||[]).length;
+      if(iScore>lScore){DB=m;applyDBToUI();toast('✓ Datos restaurados');}
+    }
+  }catch(e){}
+  document.addEventListener('change',e=>{const tg=e.target.tagName;if(tg==='INPUT'||tg==='TEXTAREA'||tg==='SELECT')autosave();});
+  setInterval(()=>{if(isDirty)saveData();},15000);
+  window.addEventListener('beforeunload',()=>writeLS(DB));
+  window.addEventListener('pagehide',()=>writeLS(DB));
+  // iOS specific: save on visibility change
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)writeLS(DB);});
+  toast('✓ Imperio Mayde™ lista');
+}
+
+document.addEventListener('DOMContentLoaded',init);
+</script>
+</body>
+</html>
