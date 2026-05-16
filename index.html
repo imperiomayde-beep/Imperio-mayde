@@ -203,6 +203,20 @@ select{cursor:pointer;background-image:none;}
 .empty{text-align:center;padding:40px 20px;color:var(--text3);}
 .empty-ico{font-size:40px;margin-bottom:10px;}
 
+.kv-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+@media(max-width:430px){.kv-grid{grid-template-columns:1fr;}.tab-lbl{font-size:8px}.tab-ico{font-size:20px}.page{padding:14px 12px 8px}.card{padding:14px}.sheet-body{padding:14px 16px}.sheet-foot{padding:10px 16px}}
+.detail-box{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:10px;}
+.detail-title{font-size:10px;color:var(--gold);font-weight:800;letter-spacing:.9px;text-transform:uppercase;margin-bottom:7px;}
+.detail-text{font-size:14px;color:var(--text2);line-height:1.65;white-space:pre-line;}
+.day-event{display:flex;align-items:center;gap:9px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer;}
+.day-event:last-child{border-bottom:none;}
+.day-event-main{flex:1;min-width:0;}
+.day-event-title{font-size:14px;font-weight:700;color:var(--text);}
+.day-event-sub{font-size:11px;color:var(--text3);margin-top:3px;}
+.print-report{background:#fff;color:#111;font-family:Arial,sans-serif;padding:28px;line-height:1.5;}
+.print-report h1,.print-report h2{color:#8B6914;}
+@media print{body{position:static!important;overflow:visible!important;background:#fff!important;color:#111!important}.topbar,.tabbar,.fab,.more-menu,.sheet-overlay:not(.printable){display:none!important}.scroll-wrap{position:static!important;overflow:visible!important}.page{display:none!important}.print-report{display:block!important}}
+
 /* ── STATUS MSG ── */
 .sm{font-size:12px;padding:10px 13px;border-radius:8px;margin-top:8px;display:none;}
 .sok{background:rgba(34,197,94,.1);color:#86EFAC;border:1px solid rgba(34,197,94,.2);display:block;}
@@ -263,6 +277,7 @@ label input[type=checkbox]{width:20px;height:20px;accent-color:var(--gold);}
       <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:8px;" id="hPillars"></div>
     </div>
   </div>
+  <div class="card" id="homeBrandSummary"></div>
   <div class="metrics-grid">
     <div class="mc"><div class="ml">Seguidores IG</div><div class="mv" id="hm-ig">0</div></div>
     <div class="mc"><div class="ml">Pines activos</div><div class="mv" id="hm-pins">0</div></div>
@@ -293,8 +308,12 @@ label input[type=checkbox]{width:20px;height:20px;accent-color:var(--gold);}
     <div class="cal-hdr" id="calHdr"></div>
     <div class="cal-grid" id="calGrid"></div>
   </div>
+  <div class="card" id="dayPanel">
+    <div class="card-hdr"><div class="card-ttl" id="dayPanelTitle">📍 Selecciona un día</div></div>
+    <div id="dayPanelBody" style="font-size:13px;color:var(--text2);">Toca una fecha del calendario para ver tareas, guiones, pines, ideas, carruseles e historias completos.</div>
+  </div>
   <div class="card">
-    <div class="card-hdr"><div class="card-ttl">📋 Plan semanal</div></div>
+    <div class="card-hdr"><div class="card-ttl">📋 Plan semanal</div><button class="btn btn-sm btn-gold" onclick="generateWeekTasks()">Auto-plan</button></div>
     <div class="section-lbl">Semana activa</div>
     <input type="date" id="weekStart" onchange="DB.weekStart=this.value;autosave();renderWeek();" style="margin-bottom:12px;font-size:14px;" />
     <div class="week-strip" id="weekStrip"></div>
@@ -400,6 +419,8 @@ label input[type=checkbox]{width:20px;height:20px;accent-color:var(--gold);}
       <div class="section-lbl">🔑 Promesa de marca</div><textarea id="bPromise" rows="2" placeholder="La promesa que haces a tu cliente..." oninput="brandLive()"></textarea>
       <div class="section-lbl">Manifiesto de marca</div><textarea id="bManifesto" rows="4" placeholder="Escribe tu manifiesto de marca..."></textarea>
       <div class="section-lbl">Mensaje central</div><textarea id="bMessage" rows="2" placeholder="El mensaje más importante..."></textarea>
+      <div class="section-lbl">Leyenda / frase de autoridad</div><textarea id="bLegend" rows="2" placeholder="La frase que quieres que la gente asocie contigo..."></textarea>
+      <div class="section-lbl">Resumen de identidad</div><textarea id="bSummary" rows="3" placeholder="Resumen ejecutivo de tu marca premium..."></textarea>
       <div class="section-lbl">💎 Pilares de contenido</div>
       <div id="pillarsList"></div>
       <button class="btn btn-sm" onclick="addPillar()" style="margin-top:8px;">+ Pilar</button>
@@ -416,6 +437,8 @@ label input[type=checkbox]{width:20px;height:20px;accent-color:var(--gold);}
       <div class="section-lbl">Tono de voz</div><textarea id="bTone" rows="3" placeholder="¿Cómo hablas? ¿Qué lenguaje usas?..."></textarea>
       <div class="section-lbl">Propuesta de valor única</div><textarea id="bUVP" rows="3" placeholder="¿Qué problema único resuelves?..."></textarea>
       <div class="section-lbl">Oferta premium</div><textarea id="bOffer" rows="3" placeholder="Producto/servicio, precio, transformación..."></textarea>
+      <div class="section-lbl">Hashtags base de la marca</div><textarea id="bHashtags" rows="2" placeholder="#MarcaPersonal #PinterestMarketing..."></textarea>
+      <div class="section-lbl">Notas extra de voz</div><textarea id="bVoiceNotes" rows="2" placeholder="Palabras que sí/no usas, límites, estilo..."></textarea>
       <div class="btn-row"><button class="btn btn-gold btn-full" onclick="saveVoice()">💾 Guardar</button></div>
       <div id="voiceSt" class="sm"></div>
     </div>
@@ -475,10 +498,14 @@ label input[type=checkbox]{width:20px;height:20px;accent-color:var(--gold);}
       <option value="json">JSON — Backup completo</option>
       <option value="csv">CSV — Excel/Sheets</option>
       <option value="md">Markdown — Notion</option>
+      <option value="doc">Word — Documento editable</option>
+      <option value="txt">Texto — Informe simple</option>
     </select>
     <div class="btn-row">
       <button class="btn btn-gold btn-full" onclick="exportData()">⬇️ Exportar</button>
       <button class="btn btn-full" onclick="exportReport()">📊 Informe mensual</button>
+      <button class="btn btn-full" onclick="exportReportPDF()">📄 PDF</button>
+      <button class="btn btn-full" onclick="exportReportWord()">📝 Word</button>
     </div>
   </div>
   <div class="card">
@@ -487,7 +514,7 @@ label input[type=checkbox]{width:20px;height:20px;accent-color:var(--gold);}
     <div class="btn-row">
       <button class="btn btn-gold btn-full" onclick="importData()">⬆️ Importar</button>
       <button class="btn btn-full" onclick="document.getElementById(&apos;fileIn&apos;).click()">📂 Archivo</button>
-      <input type="file" id="fileIn" style="display:none;" accept=".json,.txt" onchange="loadFile(event)"/>
+      <input type="file" id="fileIn" style="display:none;" accept=".json,.txt,.md,.csv" onchange="loadFile(event)"/>
     </div>
     <div id="impSt" class="sm"></div>
   </div>
@@ -548,6 +575,8 @@ label input[type=checkbox]{width:20px;height:20px;accent-color:var(--gold);}
     <div class="more-item" onclick="closeMoreMenu();showInstallTip()"><span class="more-ico">📲</span>Agregar al home screen</div>
     <div class="more-item" onclick="closeMoreMenu();exportData()"><span class="more-ico">📤</span>Exportar JSON</div>
     <div class="more-item" onclick="closeMoreMenu();exportReport()"><span class="more-ico">📊</span>Informe mensual</div>
+    <div class="more-item" onclick="closeMoreMenu();exportReportPDF()"><span class="more-ico">📄</span>Informe PDF</div>
+    <div class="more-item" onclick="closeMoreMenu();exportReportWord()"><span class="more-ico">📝</span>Informe Word</div>
   </div>
 </div>
 
@@ -588,6 +617,9 @@ label input[type=checkbox]{width:20px;height:20px;accent-color:var(--gold);}
       </div>
       <div class="section-lbl">Hook / gancho</div><input type="text" id="iHook" placeholder="La frase que detiene el scroll..."/>
       <div class="section-lbl">Fecha programada</div><input type="date" id="iDate"/>
+      <div class="section-lbl">Leyenda / caption</div><textarea id="iLegend" rows="2" placeholder="Texto sugerido para publicar..."></textarea>
+      <div class="section-lbl">Hashtags</div><input type="text" id="iHash" placeholder="#marca #contenido #premium"/>
+      <div class="section-lbl">Resumen</div><textarea id="iSummary" rows="2" placeholder="Resumen corto de la idea..."></textarea>
       <div class="section-lbl">Notas</div><textarea id="iNotes" rows="2" placeholder="Referencias, recursos..."></textarea>
     </div>
     <div class="sheet-foot"><button class="btn" onclick="closeSheet('sh-idea')" style="flex:1;">Cancelar</button><button class="btn btn-gold" onclick="saveIdea()" style="flex:2;">💾 Guardar</button></div>
@@ -610,7 +642,11 @@ label input[type=checkbox]{width:20px;height:20px;accent-color:var(--gold);}
       <div class="section-lbl">⚡ PROBLEMA (3-15 seg)</div><textarea id="scProb" rows="3" placeholder="Conecta con el dolor o deseo..."></textarea>
       <div class="section-lbl">💡 CONTENIDO (15-45 seg)</div><textarea id="scCont" rows="3" placeholder="El valor real: tips, pasos..."></textarea>
       <div class="section-lbl">📣 CTA (últimos 5 seg)</div><textarea id="scCTA" rows="2" placeholder="¿Qué debe hacer ahora?..."></textarea>
-      <div class="section-lbl">Notas de producción</div><textarea id="scNotes" rows="2" placeholder="B-roll, música, efectos..."></textarea>
+      <div class="section-lbl">B-Roll necesario</div><textarea id="scBroll" rows="2" placeholder="Tomas de apoyo visual exactas..."></textarea>
+      <div class="section-lbl">Leyenda / caption</div><textarea id="scLegend" rows="2" placeholder="Copy para Instagram/TikTok/Pinterest..."></textarea>
+      <div class="section-lbl">Hashtags</div><input type="text" id="scHash" placeholder="#MarcaPersonal #Premium"/>
+      <div class="section-lbl">Resumen del guión</div><textarea id="scSummary" rows="2" placeholder="Resumen rápido para revisar en calendario..."></textarea>
+      <div class="section-lbl">Notas de producción</div><textarea id="scNotes" rows="2" placeholder="Música, efectos, props, edición..."></textarea>
     </div>
     <div class="sheet-foot"><button class="btn" onclick="closeSheet('sh-script')" style="flex:1;">Cancelar</button><button class="btn btn-gold" onclick="saveScript()" style="flex:2;">💾 Guardar</button></div>
   </div>
@@ -682,6 +718,10 @@ label input[type=checkbox]{width:20px;height:20px;accent-color:var(--gold);}
       </div>
       <div class="section-lbl">Estado</div>
       <select id="pinStatus"><option value="pendiente">Pendiente</option><option value="programado">Programado</option><option value="publicado">Publicado</option></select>
+      <div class="section-lbl">Leyenda en imagen</div><input type="text" id="pinLegend" placeholder="Texto grande del pin..."/>
+      <div class="section-lbl">Keywords / hashtags</div><input type="text" id="pinHash" placeholder="marca personal, negocio premium, #pinterest"/>
+      <div class="section-lbl">Resumen + notas extra</div><textarea id="pinNotes" rows="3" placeholder="Brief visual, CTA, tablero alterno, permisos..."></textarea>
+      <label style="margin-top:12px;"><input type="checkbox" id="pinAllow"/> Permiso para abrir Pinterest y publicar desde este sistema</label>
     </div>
     <div class="sheet-foot">
       <button class="btn btn-green" onclick="pinToP()" style="flex:1;">📌 Pinterest</button>
@@ -722,7 +762,7 @@ label input[type=checkbox]{width:20px;height:20px;accent-color:var(--gold);}
 const SK='IM_DB_v4';
 let idb=null,isDirty=false,saveTimer=null;
 
-function defaultDB(){return{brand:{name:'Imperio Mayde™',slogan:'',vision:'',mission:'',purpose:'',promise:'',manifesto:'',message:'',pillars:[],avatar:'',colors:'',fonts:'',personality:'',tone:'',uvp:'',offer:'',methodSteps:[],phases:Array.from({length:7},(_,i)=>({phase:i+1,title:'Fase '+(i+1),desc:'',actions:''})),contentFormats:[]},tasks:[],ideas:[],scripts:[],carousels:[],stories:[],pins:[],metrics:[],checklists:{pre:[],broll:[],edit:[],pint:[]},weekStart:'',logo:'',mIG:0,mReach:0,mEng:0,mSales:0,mWeb:0,mLeads:0,mPint:0,mVid:0};}
+function defaultDB(){return{brand:{name:'Imperio Mayde™',slogan:'',vision:'',mission:'',purpose:'',promise:'',manifesto:'',message:'',legend:'',summary:'',pillars:[],avatar:'',colors:'',fonts:'',personality:'',tone:'',uvp:'',offer:'',hashtags:'',voiceNotes:'',methodSteps:[],phases:Array.from({length:7},(_,i)=>({phase:i+1,title:'Fase '+(i+1),desc:'',actions:''})),contentFormats:[]},tasks:[],ideas:[],scripts:[],carousels:[],stories:[],pins:[],metrics:[],checklists:{pre:[],broll:[],edit:[],pint:[]},weekStart:'',logo:'',mIG:0,mReach:0,mEng:0,mSales:0,mWeb:0,mLeads:0,mPint:0,mVid:0};}
 
 function mergeDB(d){
   if(!d)return defaultDB();
@@ -838,6 +878,15 @@ function renderHomePillars(){
   const el=document.getElementById('hPillars');if(!el)return;
   el.innerHTML=(DB.brand.pillars||[]).map(p=>`<span class="tag tg">${esc(p.name||p)}</span>`).join('');
 }
+
+function renderHomeBrandSummary(){
+  const el=document.getElementById('homeBrandSummary');if(!el)return;
+  const b=DB.brand||{};
+  const blocks=[['Visión',b.vision],['Misión',b.mission],['Propósito',b.purpose],['Personalidad',b.personality],['Promesa',b.promise],['Leyenda',b.legend],['Resumen',b.summary]];
+  el.innerHTML=`<div class="card-hdr"><div class="card-ttl">👑 Base premium</div><button class="btn btn-sm" onclick="navTo('brand',document.getElementById('tab-brand'))">Editar</button></div>`+
+    `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;">${blocks.filter(x=>x[1]).slice(0,4).map(x=>`<span class="tag tg">${x[0]}</span>`).join('')||'<span class="tag tb">Completa tu marca</span>'}</div>`+
+    `<div style="font-size:12px;color:var(--text2);line-height:1.6;">${esc(b.summary||b.message||b.promise||'Completa visión, misión, propósito, promesa, personalidad y tono para que tu sistema se convierta en una base de datos de marca personal premium.')}</div>`;
+}
 function renderHomeWeek(){
   const el=document.getElementById('hWeek');if(!el)return;
   const WD=[{n:'Lunes',e:'💡',f:'Ideas'},{n:'Martes',e:'✍️',f:'Guiones'},{n:'Miérc.',e:'🎠',f:'Diseño'},{n:'Jueves',e:'🎬',f:'Grabación'},{n:'Viernes',e:'✂️',f:'Edición'},{n:'Sábado',e:'📌',f:'Pinterest'},{n:'Domingo',e:'📊',f:'Métricas'}];
@@ -856,7 +905,7 @@ function renderHomeToday(){
 // ====================================================
 function loadBrandFields(){
   const b=DB.brand;
-  const map={bName:'name',bSlogan:'slogan',bVision:'vision',bMission:'mission',bPurpose:'purpose',bPromise:'promise',bManifesto:'manifesto',bMessage:'message',bAvatar:'avatar',bColors:'colors',bFonts:'fonts',bPersonality:'personality',bTone:'tone',bUVP:'uvp',bOffer:'offer'};
+  const map={bName:'name',bSlogan:'slogan',bVision:'vision',bMission:'mission',bPurpose:'purpose',bPromise:'promise',bManifesto:'manifesto',bMessage:'message',bLegend:'legend',bSummary:'summary',bAvatar:'avatar',bColors:'colors',bFonts:'fonts',bPersonality:'personality',bTone:'tone',bUVP:'uvp',bOffer:'offer',bHashtags:'hashtags',bVoiceNotes:'voiceNotes'};
   Object.entries(map).forEach(([id,k])=>{const e=document.getElementById(id);if(e&&b[k]!==undefined)e.value=b[k];});
 }
 function brandLive(){
@@ -869,9 +918,10 @@ function brandLive(){
   document.getElementById('topSlogan').textContent=s||'Tu sistema de marca';
   document.getElementById('hPromise').textContent=p||'Tu promesa de marca';
   document.getElementById('sbName') && (document.getElementById('sbName').textContent=n);
+  renderHomeBrandSummary();
 }
 function saveBrand(show=true){
-  const map={bName:'name',bSlogan:'slogan',bVision:'vision',bMission:'mission',bPurpose:'purpose',bPromise:'promise',bManifesto:'manifesto',bMessage:'message',bAvatar:'avatar',bColors:'colors',bFonts:'fonts'};
+  const map={bName:'name',bSlogan:'slogan',bVision:'vision',bMission:'mission',bPurpose:'purpose',bPromise:'promise',bManifesto:'manifesto',bMessage:'message',bLegend:'legend',bSummary:'summary',bAvatar:'avatar',bColors:'colors',bFonts:'fonts'};
   Object.entries(map).forEach(([id,k])=>{const e=document.getElementById(id);if(e)DB.brand[k]=e.value;});
   autosave();brandLive();renderHomePillars();
   if(show){showSt('brandSt','✓ Identidad guardada','sok');toast('✓ Marca guardada');}
@@ -881,6 +931,8 @@ function saveVoice(){
   DB.brand.tone=document.getElementById('bTone').value;
   DB.brand.uvp=document.getElementById('bUVP').value;
   DB.brand.offer=document.getElementById('bOffer').value;
+  DB.brand.hashtags=document.getElementById('bHashtags').value;
+  DB.brand.voiceNotes=document.getElementById('bVoiceNotes').value;
   autosave();showSt('voiceSt','✓ Guardado','sok');toast('✓ Guardado');
 }
 function renderPillars(){
@@ -1015,12 +1067,12 @@ function renderTasks(){
 function prepIdea(id=''){
   document.getElementById('shIdeaTtl').textContent=id?'✏️ Editar idea':'💡 Nueva idea';
   document.getElementById('iEid').value=id;
-  if(id){const x=DB.ideas.find(i=>i.id===id);if(x){document.getElementById('iText').value=x.text||'';document.getElementById('iCat').value=x.cat||'Educativo';document.getElementById('iFmt').value=x.fmt||'Reel IG';document.getElementById('iHook').value=x.hook||'';document.getElementById('iDate').value=x.date||'';document.getElementById('iNotes').value=x.notes||'';}}
-  else{['iText','iHook','iNotes'].forEach(i=>document.getElementById(i).value='');document.getElementById('iDate').value='';document.getElementById('iCat').value='Educativo';document.getElementById('iFmt').value='Reel IG';}
+  if(id){const x=DB.ideas.find(i=>i.id===id);if(x){document.getElementById('iText').value=x.text||'';document.getElementById('iCat').value=x.cat||'Educativo';document.getElementById('iFmt').value=x.fmt||'Reel IG';document.getElementById('iHook').value=x.hook||'';document.getElementById('iDate').value=x.date||'';document.getElementById('iLegend').value=x.legend||'';document.getElementById('iHash').value=x.hash||'';document.getElementById('iSummary').value=x.summary||'';document.getElementById('iNotes').value=x.notes||'';}}
+  else{['iText','iHook','iLegend','iHash','iSummary','iNotes'].forEach(i=>document.getElementById(i).value='');document.getElementById('iDate').value='';document.getElementById('iCat').value='Educativo';document.getElementById('iFmt').value='Reel IG';}
 }
 function saveIdea(){
   const id=document.getElementById('iEid').value;
-  const item={id:id||uid(),text:document.getElementById('iText').value.trim(),cat:document.getElementById('iCat').value,fmt:document.getElementById('iFmt').value,hook:document.getElementById('iHook').value,date:document.getElementById('iDate').value,notes:document.getElementById('iNotes').value};
+  const item={id:id||uid(),text:document.getElementById('iText').value.trim(),cat:document.getElementById('iCat').value,fmt:document.getElementById('iFmt').value,hook:document.getElementById('iHook').value,date:document.getElementById('iDate').value,legend:document.getElementById('iLegend').value,hash:document.getElementById('iHash').value,summary:document.getElementById('iSummary').value,notes:document.getElementById('iNotes').value};
   if(!item.text){toast('Escribe la idea');return;}
   if(id){const i=DB.ideas.findIndex(x=>x.id===id);if(i>=0)DB.ideas[i]=item;}else DB.ideas.push(item);
   autosave();closeSheet('sh-idea');renderIdeas();updateBadges();updateHomeMetrics();
@@ -1035,6 +1087,9 @@ function renderIdeas(){
           <div class="di-ttl">${esc(x.text)}</div>
           <div class="di-meta">${x.date?`<span class="tag tp">📅 ${fd(x.date)}</span>`:''}<span class="tag tg">${x.cat}</span><span class="tag tb">${x.fmt}</span></div>
           ${x.hook?`<div class="di-body" style="color:var(--gold);">🎯 ${esc(x.hook)}</div>`:''}
+          ${x.summary?`<div class="di-body"><strong>Resumen:</strong> ${esc(x.summary)}</div>`:''}
+          ${x.legend?`<div class="di-body"><strong>Leyenda:</strong> ${esc(x.legend)}</div>`:''}
+          ${x.hash?`<div class="di-body" style="color:var(--gold);">${esc(x.hash)}</div>`:''}
           ${x.notes?`<div class="di-body">${esc(x.notes)}</div>`:''}
         </div>
         <div class="di-acts">
@@ -1051,12 +1106,12 @@ function renderIdeas(){
 function prepScript(id=''){
   document.getElementById('shScTtl').textContent=id?'✏️ Editar guión':'✍️ Nuevo guión';
   document.getElementById('scEid').value=id;
-  if(id){const x=DB.scripts.find(s=>s.id===id);if(x){document.getElementById('scTitle').value=x.title||'';document.getElementById('scDate').value=x.date||'';document.getElementById('scFmt').value=x.fmt||'Reel IG';document.getElementById('scHook').value=x.hook||'';document.getElementById('scProb').value=x.prob||'';document.getElementById('scCont').value=x.cont||'';document.getElementById('scCTA').value=x.cta||'';document.getElementById('scNotes').value=x.notes||'';}}
-  else{['scTitle','scHook','scProb','scCont','scCTA','scNotes'].forEach(i=>document.getElementById(i).value='');document.getElementById('scDate').value='';document.getElementById('scFmt').value='Reel IG';}
+  if(id){const x=DB.scripts.find(s=>s.id===id);if(x){document.getElementById('scTitle').value=x.title||'';document.getElementById('scDate').value=x.date||'';document.getElementById('scFmt').value=x.fmt||'Reel IG';document.getElementById('scHook').value=x.hook||'';document.getElementById('scProb').value=x.prob||'';document.getElementById('scCont').value=x.cont||'';document.getElementById('scCTA').value=x.cta||'';document.getElementById('scBroll').value=x.broll||'';document.getElementById('scLegend').value=x.legend||'';document.getElementById('scHash').value=x.hash||'';document.getElementById('scSummary').value=x.summary||'';document.getElementById('scNotes').value=x.notes||'';}}
+  else{['scTitle','scHook','scProb','scCont','scCTA','scBroll','scLegend','scHash','scSummary','scNotes'].forEach(i=>document.getElementById(i).value='');document.getElementById('scDate').value='';document.getElementById('scFmt').value='Reel IG';}
 }
 function saveScript(){
   const id=document.getElementById('scEid').value;
-  const item={id:id||uid(),title:document.getElementById('scTitle').value.trim(),date:document.getElementById('scDate').value,fmt:document.getElementById('scFmt').value,hook:document.getElementById('scHook').value,prob:document.getElementById('scProb').value,cont:document.getElementById('scCont').value,cta:document.getElementById('scCTA').value,notes:document.getElementById('scNotes').value};
+  const item={id:id||uid(),title:document.getElementById('scTitle').value.trim(),date:document.getElementById('scDate').value,fmt:document.getElementById('scFmt').value,hook:document.getElementById('scHook').value,prob:document.getElementById('scProb').value,cont:document.getElementById('scCont').value,cta:document.getElementById('scCTA').value,broll:document.getElementById('scBroll').value,legend:document.getElementById('scLegend').value,hash:document.getElementById('scHash').value,summary:document.getElementById('scSummary').value,notes:document.getElementById('scNotes').value};
   if(!item.title){toast('Escribe el título');return;}
   if(id){const i=DB.scripts.findIndex(x=>x.id===id);if(i>=0)DB.scripts[i]=item;}else DB.scripts.push(item);
   autosave();closeSheet('sh-script');renderScripts();updateBadges();updateCal();updateHomeMetrics();
@@ -1070,6 +1125,10 @@ function viewScript(id){
     ${x.prob?`<div class="card" style="margin-bottom:10px;"><div style="font-size:10px;color:var(--gold);font-weight:700;letter-spacing:1px;margin-bottom:6px;">⚡ PROBLEMA — 3 a 15 seg</div><div style="font-size:15px;line-height:1.7;">${esc(x.prob)}</div></div>`:''}
     ${x.cont?`<div class="card" style="margin-bottom:10px;"><div style="font-size:10px;color:var(--gold);font-weight:700;letter-spacing:1px;margin-bottom:6px;">💡 CONTENIDO — 15 a 45 seg</div><div style="font-size:15px;line-height:1.7;">${esc(x.cont)}</div></div>`:''}
     ${x.cta?`<div class="card" style="margin-bottom:10px;"><div style="font-size:10px;color:var(--gold);font-weight:700;letter-spacing:1px;margin-bottom:6px;">📣 CTA — últimos 5 seg</div><div style="font-size:15px;line-height:1.7;">${esc(x.cta)}</div></div>`:''}
+    ${x.summary?`<div class="detail-box"><div class="detail-title">📌 Resumen</div><div class="detail-text">${esc(x.summary)}</div></div>`:''}
+    ${x.broll?`<div class="detail-box"><div class="detail-title">🎥 B-Roll necesario</div><div class="detail-text">${esc(x.broll)}</div></div>`:''}
+    ${x.legend?`<div class="detail-box"><div class="detail-title">🧲 Leyenda / caption</div><div class="detail-text">${esc(x.legend)}</div></div>`:''}
+    ${x.hash?`<div class="detail-box"><div class="detail-title"># Hashtags</div><div class="detail-text">${esc(x.hash)}</div></div>`:''}
     ${x.notes?`<div class="card"><div style="font-size:10px;color:var(--text3);font-weight:700;letter-spacing:1px;margin-bottom:6px;">📝 NOTAS DE PRODUCCIÓN</div><div style="font-size:14px;color:var(--text2);line-height:1.7;">${esc(x.notes)}</div></div>`:''}
     <div style="display:flex;gap:8px;margin-top:14px;">
       <button class="btn btn-full" onclick="openSheet('sh-script','${x.id}');closeSheet('sh-script-view')">✏️ Editar</button>
@@ -1086,7 +1145,7 @@ function renderScripts(){
         <div style="flex:1;min-width:0;" onclick="viewScript('${x.id}')">
           <div class="di-ttl">${esc(x.title)}</div>
           <div class="di-meta"><span class="tag tb">${x.fmt}</span>${x.date?`<span class="tag tg">📅 ${fd(x.date)}</span>`:''}</div>
-          ${x.hook?`<div class="di-body" style="font-style:italic;">"${esc(x.hook.substring(0,70))}..."</div>`:''}
+          ${x.summary?`<div class="di-body"><strong>Resumen:</strong> ${esc(x.summary)}</div>`:''}${x.hook?`<div class="di-body" style="font-style:italic;">"${esc(x.hook.substring(0,70))}..."</div>`:''}
         </div>
         <div class="di-acts">
           <button class="btn btn-sm" onclick="viewScript('${x.id}')">👁</button>
@@ -1182,17 +1241,19 @@ function renderStories(){
 function prepPin(id=''){
   document.getElementById('shPinTtl').textContent=id?'✏️ Editar pin':'📌 Nuevo pin';
   document.getElementById('pinEid').value=id;
-  if(id){const x=DB.pins.find(p=>p.id===id);if(x){document.getElementById('pinTitle').value=x.title||'';document.getElementById('pinDesc').value=x.desc||'';document.getElementById('pinUrl').value=x.url||'';document.getElementById('pinBoard').value=x.board||'';document.getElementById('pinFmt').value=x.fmt||'Pin estático';document.getElementById('pinDate').value=x.date||'';document.getElementById('pinStatus').value=x.status||'pendiente';}}
-  else{['pinTitle','pinDesc','pinUrl','pinBoard'].forEach(i=>document.getElementById(i).value='');document.getElementById('pinDate').value='';document.getElementById('pinFmt').value='Pin estático';document.getElementById('pinStatus').value='pendiente';}
+  if(id){const x=DB.pins.find(p=>p.id===id);if(x){document.getElementById('pinTitle').value=x.title||'';document.getElementById('pinDesc').value=x.desc||'';document.getElementById('pinUrl').value=x.url||'';document.getElementById('pinBoard').value=x.board||'';document.getElementById('pinFmt').value=x.fmt||'Pin estático';document.getElementById('pinDate').value=x.date||'';document.getElementById('pinStatus').value=x.status||'pendiente';document.getElementById('pinLegend').value=x.legend||'';document.getElementById('pinHash').value=x.hash||'';document.getElementById('pinNotes').value=x.notes||'';document.getElementById('pinAllow').checked=!!x.allow;}}
+  else{['pinTitle','pinDesc','pinUrl','pinBoard','pinLegend','pinHash','pinNotes'].forEach(i=>document.getElementById(i).value='');document.getElementById('pinDate').value='';document.getElementById('pinFmt').value='Pin estático';document.getElementById('pinStatus').value='pendiente';document.getElementById('pinAllow').checked=false;}
 }
 function savePin(){
   const id=document.getElementById('pinEid').value;
-  const item={id:id||uid(),title:document.getElementById('pinTitle').value.trim(),desc:document.getElementById('pinDesc').value,url:document.getElementById('pinUrl').value,board:document.getElementById('pinBoard').value,fmt:document.getElementById('pinFmt').value,date:document.getElementById('pinDate').value,status:document.getElementById('pinStatus').value};
+  const item={id:id||uid(),title:document.getElementById('pinTitle').value.trim(),desc:document.getElementById('pinDesc').value,url:document.getElementById('pinUrl').value,board:document.getElementById('pinBoard').value,fmt:document.getElementById('pinFmt').value,date:document.getElementById('pinDate').value,status:document.getElementById('pinStatus').value,legend:document.getElementById('pinLegend').value,hash:document.getElementById('pinHash').value,notes:document.getElementById('pinNotes').value,allow:document.getElementById('pinAllow').checked};
   if(!item.title){toast('Escribe el título');return;}
   if(id){const i=DB.pins.findIndex(x=>x.id===id);if(i>=0)DB.pins[i]=item;}else DB.pins.push(item);
   autosave();closeSheet('sh-pin');renderPins();updateBadges();updateHomeMetrics();
 }
 function pinToP(){
+  const allow=document.getElementById('pinAllow');
+  if(allow&&!allow.checked&&!confirm('Pinterest requiere abrir una ventana externa. Marca el permiso si quieres publicar desde este sistema. ¿Abrir ahora?'))return;
   const t=document.getElementById('pinTitle').value;
   const d=document.getElementById('pinDesc').value;
   const u=document.getElementById('pinUrl').value;
@@ -1217,7 +1278,7 @@ function renderPins(){
                 <span class="tag ${sc[x.status]||'tg'}" onclick="cyclePinStatus('${x.id}')" style="cursor:pointer;">${x.status}</span>
                 ${x.board?`<span class="tag tp">${esc(x.board)}</span>`:''}
               </div>
-              ${x.desc?`<div class="di-body">${esc(x.desc.substring(0,80))}...</div>`:''}
+              ${x.legend?`<div class="di-body"><strong>Leyenda:</strong> ${esc(x.legend)}</div>`:''}${x.desc?`<div class="di-body">${esc(x.desc.substring(0,100))}...</div>`:''}${x.hash?`<div class="di-body" style="color:var(--gold);">${esc(x.hash)}</div>`:''}${x.notes?`<div class="di-body"><strong>Notas:</strong> ${esc(x.notes)}</div>`:''}
             </div>
           </div>
           <div class="di-acts">
@@ -1271,18 +1332,50 @@ function renderCal(){
     const tasks=DB.tasks.filter(t=>t.date===ds);
     const sc=DB.scripts.filter(s=>s.date===ds);
     const pins=DB.pins.filter(p=>p.date===ds);
+    const ideas=DB.ideas.filter(i=>i.date===ds);
+    const cars=DB.carousels.filter(c=>c.date===ds);
+    const stories=DB.stories.filter(st=>st.date===ds);
     const isT=today.getFullYear()===calY&&today.getMonth()===calM&&today.getDate()===d;
-    const has=tasks.length||sc.length||pins.length;
+    const has=tasks.length||sc.length||pins.length||ideas.length||cars.length||stories.length;
     html+=`<div class="cal-d ${isT?'today':''} ${has?'hasit':''}" onclick="calClick('${ds}')">
       <div class="cal-d-n">${d}</div>
-      <div style="display:flex;flex-wrap:wrap;gap:2px;">${tasks.slice(0,2).map(()=>'<div class="cal-dot"></div>').join('')}${sc.length?'<div class="cal-dot" style="background:#A855F7;"></div>':''}${pins.length?'<div class="cal-dot" style="background:#EF4444;"></div>':''}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:2px;">${tasks.slice(0,2).map(()=>'<div class="cal-dot"></div>').join('')}${ideas.length?'<div class="cal-dot" style="background:#3B82F6;"></div>':''}${sc.length?'<div class="cal-dot" style="background:#A855F7;"></div>':''}${pins.length?'<div class="cal-dot" style="background:#EF4444;"></div>':''}${cars.length?'<div class="cal-dot" style="background:#F0C060;"></div>':''}${stories.length?'<div class="cal-dot" style="background:#22C55E;"></div>':''}</div>
     </div>`;
   }
   document.getElementById('calGrid').innerHTML=html;
   renderWeek();
 }
-function calClick(date){document.getElementById('tDate').value=date;openSheet('sh-task','');}
+function calClick(date){renderDayPanel(date);}
 function updateCal(){if(document.getElementById('calGrid'))renderCal();}
+
+
+function itemRow(icon,type,title,sub,action){
+  return `<div class="day-event" onclick="${action}"><span style="font-size:20px;">${icon}</span><div class="day-event-main"><div class="day-event-title">${esc(title)}</div><div class="day-event-sub">${type}${sub?' · '+esc(sub):''}</div></div><span style="color:var(--gold);">›</span></div>`;
+}
+function renderDayPanel(date){
+  const ttl=document.getElementById('dayPanelTitle'),body=document.getElementById('dayPanelBody');if(!ttl||!body)return;
+  ttl.textContent='📍 '+fd(date);
+  const tasks=DB.tasks.filter(t=>t.date===date), ideas=DB.ideas.filter(i=>i.date===date), scripts=DB.scripts.filter(s=>s.date===date), pins=DB.pins.filter(p=>p.date===date), cars=DB.carousels.filter(c=>c.date===date), stories=DB.stories.filter(st=>st.date===date);
+  let html=`<div class="btn-row" style="margin-bottom:10px;"><button class="btn btn-sm btn-gold" onclick="document.getElementById('tDate').value='${date}';openSheet('sh-task','')">+ Tarea</button><button class="btn btn-sm" onclick="document.getElementById('scDate').value='${date}';openSheet('sh-script','')">+ Guión</button><button class="btn btn-sm" onclick="document.getElementById('pinDate').value='${date}';openSheet('sh-pin','')">+ Pin</button></div>`;
+  const rows=[];
+  tasks.forEach(t=>rows.push(itemRow(t.done?'✅':'⬜','Tarea',t.title,`${t.cat}${t.time?' · '+t.time:''}`,`openSheet('sh-task','${t.id}')`)));
+  ideas.forEach(i=>rows.push(itemRow('💡','Idea',i.text,i.fmt,`openSheet('sh-idea','${i.id}')`)));
+  scripts.forEach(sc=>rows.push(itemRow('✍️','Guión',sc.title,sc.summary||sc.fmt,`viewScript('${sc.id}')`)));
+  pins.forEach(p=>rows.push(itemRow('📌','Pin Pinterest',p.title,`${p.status}${p.board?' · '+p.board:''}`,`openSheet('sh-pin','${p.id}')`)));
+  cars.forEach(c=>rows.push(itemRow('🎠','Carrusel',c.topic,c.goal,`openSheet('sh-car','${c.id}')`)));
+  stories.forEach(st=>rows.push(itemRow('📱','Historia',st.topic,st.type,`openSheet('sh-story','${st.id}')`)));
+  body.innerHTML=html+(rows.length?rows.join(''):'<div style="color:var(--text3);padding:10px 0;">No hay contenido para este día. Usa los botones para planificarlo.</div>');
+}
+function generateWeekTasks(){
+  const ws=document.getElementById('weekStart').value||new Date().toISOString().split('T')[0];
+  WDAYS.forEach((d,i)=>{
+    const dt=new Date(ws);dt.setDate(dt.getDate()+i);const date=dt.toISOString().split('T')[0];
+    DTASKS[i].forEach((title,j)=>{
+      if(!DB.tasks.find(t=>t.date===date&&t.title===title))DB.tasks.push({id:uid(),title,date,cat:d.f.split(' ')[0].replace('&',''),time:j===0?'9:00am':'' ,desc:'Plan automático semanal Imperio Mayde™',prio:'normal',done:false});
+    });
+  });
+  autosave();renderTasks();renderWeek();renderCal();renderHomeToday();updateBadges();toast('✓ Plan semanal creado');
+}
 
 // WEEK
 function renderWeek(){
@@ -1338,12 +1431,14 @@ function del(col,id,fn){
 // EXPORT / IMPORT
 // ====================================================
 function exportData(){
-  const fmt=document.getElementById('expFmt').value;
-  const data={brand_name:DB.brand.name,export_date:new Date().toISOString(),ideas:DB.ideas,scripts:DB.scripts,carousels:DB.carousels,stories:DB.stories,pins:DB.pins,tasks:DB.tasks,metrics:DB.metrics,brand:DB.brand,checklists:DB.checklists};
+  const fmt=(document.getElementById('expFmt')&&document.getElementById('expFmt').value)||'json';
+  const data={brand_name:DB.brand.name,export_date:new Date().toISOString(),ideas:DB.ideas,scripts:DB.scripts,carousels:DB.carousels,stories:DB.stories,pins:DB.pins,tasks:DB.tasks,metrics:DB.metrics,brand:DB.brand,checklists:DB.checklists,weekStart:DB.weekStart,logo:DB.logo};
   let c,t,x;
   if(fmt==='json'){c=JSON.stringify(data,null,2);t='application/json';x='json';}
   else if(fmt==='csv'){c='seccion,datos\n'+Object.entries(data).map(([k,v])=>`${k},"${JSON.stringify(v).replace(/"/g,'""')}"`).join('\n');t='text/csv';x='csv';}
-  else{c=`# Imperio Mayde™\n## Ideas\n${(data.ideas||[]).map(i=>`- **${i.text}** | ${i.fmt}`).join('\n')}\n## Guiones\n${(data.scripts||[]).map(s=>`### ${s.title}\n- Hook: ${s.hook||'—'}`).join('\n\n')}\n## Marca\n- Visión: ${data.brand.vision||'—'}\n- Misión: ${data.brand.mission||'—'}`;t='text/markdown';x='md';}
+  else if(fmt==='md'){c=`# Imperio Mayde™\n\n## Marca\n- Visión: ${data.brand.vision||'—'}\n- Misión: ${data.brand.mission||'—'}\n- Propósito: ${data.brand.purpose||'—'}\n- Promesa: ${data.brand.promise||'—'}\n\n## Ideas\n${(data.ideas||[]).map(i=>`- **${i.text}** | ${i.fmt} | ${i.date||'sin fecha'}`).join('\n')}\n\n## Guiones\n${(data.scripts||[]).map(s=>`### ${s.title}\n- Fecha: ${s.date||'—'}\n- Hook: ${s.hook||'—'}\n- Resumen: ${s.summary||'—'}`).join('\n\n')}`;t='text/markdown';x='md';}
+  else if(fmt==='doc'){c=buildReportHTML();t='application/msword';x='doc';}
+  else{c=buildReportText();t='text/plain';x='txt';}
   const b=new Blob([c],{type:t});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`im-backup-${new Date().toISOString().split('T')[0]}.${x}`;a.click();toast('✓ Exportado');
 }
 function importData(){
@@ -1359,7 +1454,9 @@ function importData(){
     if(p.metrics)DB.metrics=[...DB.metrics,...p.metrics];
     if(p.brand)DB.brand={...DB.brand,...p.brand};
     if(p.checklists)DB.checklists={...DB.checklists,...p.checklists};
-    autosave();renderAll();loadBrandFields();brandLive();
+    if(p.weekStart)DB.weekStart=p.weekStart;
+    if(p.logo)DB.logo=p.logo;
+    autosave();renderAll();loadBrandFields();brandLive();renderLogo();
     showSt('impSt','✓ Datos importados correctamente','sok');toast('✓ Importación exitosa');
   }catch(e){showSt('impSt','✗ JSON inválido. Verifica el formato.','serr');}
 }
@@ -1373,15 +1470,31 @@ function exportStoriesWord(){
   html+='</table></body></html>';
   const b=new Blob([html],{type:'application/msword'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='historias-im.doc';a.click();toast('✓ Word descargado');
 }
-function exportReport(){
-  let c='IMPERIO MAYDE™ — INFORME MENSUAL\n'+new Date().toLocaleDateString('es')+'\n\n';
+function buildReportText(){
+  let c='IMPERIO MAYDE™ — INFORME GENERAL MENSUAL\n'+new Date().toLocaleDateString('es')+'\n\n';
+  const b=DB.brand||{};
+  c+=`MARCA PREMIUM\nNombre: ${b.name||''}\nSlogan: ${b.slogan||''}\nVisión: ${b.vision||''}\nMisión: ${b.mission||''}\nPropósito: ${b.purpose||''}\nPromesa: ${b.promise||''}\nPersonalidad: ${b.personality||''}\nTono: ${b.tone||''}\nHashtags: ${b.hashtags||''}\n\n`;
   c+='MÉTRICAS:\n';
-  if(DB.metrics.length){const l=DB.metrics[DB.metrics.length-1];c+=`IG: ${l.ig} seguidores | Alcance: ${l.reach} | Engagement: ${l.eng}%\nVentas: ${l.sales} | Leads: ${l.leads} | Pinterest: ${l.pint} impr.\n`;}
+  if(DB.metrics.length){const l=DB.metrics[DB.metrics.length-1];c+=`IG: ${l.ig} seguidores | Alcance: ${l.reach} | Engagement: ${l.eng}%\nVentas: ${l.sales} | Leads: ${l.leads} | Pinterest: ${l.pint} impr. | Videos: ${l.vid}\n`;}
   c+=`\nCONTENIDO:\nIdeas: ${DB.ideas.length} | Guiones: ${DB.scripts.length} | Carruseles: ${DB.carousels.length} | Historias: ${DB.stories.length}\n`;
-  c+=`\nPINTEREST:\nTotal: ${DB.pins.length} | Publicados: ${DB.pins.filter(p=>p.status==='publicado').length} | Pendientes: ${DB.pins.filter(p=>p.status==='pendiente').length}\n`;
+  c+=`\nPINTEREST:\nTotal: ${DB.pins.length} | Publicados: ${DB.pins.filter(p=>p.status==='publicado').length} | Programados: ${DB.pins.filter(p=>p.status==='programado').length} | Pendientes: ${DB.pins.filter(p=>p.status==='pendiente').length}\n`;
   c+=`\nTAREAS:\nTotal: ${DB.tasks.length} | Completadas: ${DB.tasks.filter(t=>t.done).length} | Pendientes: ${DB.tasks.filter(t=>!t.done).length}\n`;
-  c+='\nIDEAS:\n'+DB.ideas.map((x,i)=>`${i+1}. [${x.cat}] ${x.text}`).join('\n');
-  const b=new Blob([c],{type:'text/plain'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='informe-im.txt';a.click();toast('✓ Informe descargado');
+  c+='\nIDEAS:\n'+DB.ideas.map((x,i)=>`${i+1}. [${x.cat}/${x.fmt}] ${x.text} ${x.date?'- '+fd(x.date):''}\nResumen: ${x.summary||''}\nLeyenda: ${x.legend||''}\nHashtags: ${x.hash||''}`).join('\n');
+  c+='\n\nGUIONES:\n'+DB.scripts.map((x,i)=>`${i+1}. ${x.title} (${x.fmt}) ${x.date?'- '+fd(x.date):''}\nHook: ${x.hook||''}\nResumen: ${x.summary||''}\nB-Roll: ${x.broll||''}\nCTA: ${x.cta||''}`).join('\n\n');
+  c+='\n\nPINES:\n'+DB.pins.map((x,i)=>`${i+1}. ${x.title} | ${x.status} | ${x.board||''}\nDescripción: ${x.desc||''}\nLeyenda: ${x.legend||''}\nKeywords: ${x.hash||''}`).join('\n\n');
+  return c;
+}
+function buildReportHTML(){
+  const b=DB.brand||{}, last=DB.metrics[DB.metrics.length-1]||{};
+  const row=(a,v)=>`<tr><th>${a}</th><td>${esc(v||'—')}</td></tr>`;
+  return `<html><head><meta charset="UTF-8"><style>body{font-family:Arial;color:#111;line-height:1.5}h1,h2{color:#8B6914}table{border-collapse:collapse;width:100%;margin:10px 0 22px}td,th{border:1px solid #ddd;padding:8px;text-align:left;vertical-align:top}th{background:#F0C060;color:#111;width:28%}.pill{display:inline-block;background:#111;color:#F0C060;padding:3px 8px;border-radius:12px;margin:2px}</style></head><body><h1>Imperio Mayde™ — Informe general mensual</h1><p>${new Date().toLocaleDateString('es')}</p><h2>Marca premium</h2><table>${row('Nombre',b.name)}${row('Slogan',b.slogan)}${row('Visión',b.vision)}${row('Misión',b.mission)}${row('Propósito',b.purpose)}${row('Promesa',b.promise)}${row('Personalidad',b.personality)}${row('Tono',b.tone)}${row('Manifiesto',b.manifesto)}${row('Mensaje central',b.message)}${row('Leyenda',b.legend)}${row('Hashtags',b.hashtags)}</table><h2>Métricas</h2><p>IG: ${last.ig||0} · Alcance: ${last.reach||0} · Engagement: ${last.eng||0}% · Pinterest: ${last.pint||0} impresiones · Leads: ${last.leads||0} · Ventas: ${last.sales||0}</p><h2>Resumen de base de datos</h2><p><span class="pill">${DB.tasks.length} tareas</span><span class="pill">${DB.ideas.length} ideas</span><span class="pill">${DB.scripts.length} guiones</span><span class="pill">${DB.carousels.length} carruseles</span><span class="pill">${DB.stories.length} historias</span><span class="pill">${DB.pins.length} pines</span></p><h2>Plan semanal</h2><ul>${WDAYS.map((d,i)=>`<li><b>${d.n} — ${d.f}:</b> ${DTASKS[i].join('; ')}</li>`).join('')}</ul><h2>Guiones</h2>${DB.scripts.map(x=>`<h3>${esc(x.title)}</h3><p><b>Fecha:</b> ${x.date?fd(x.date):'—'} · <b>Formato:</b> ${esc(x.fmt)}</p><p><b>Hook:</b> ${esc(x.hook||'')}</p><p><b>Contenido:</b> ${esc(x.cont||'')}</p><p><b>B-Roll:</b> ${esc(x.broll||'')}</p><p><b>Leyenda:</b> ${esc(x.legend||'')}</p>`).join('')}<h2>Pines Pinterest</h2>${DB.pins.map(x=>`<h3>${esc(x.title)}</h3><p>${esc(x.desc||'')}</p><p><b>Estado:</b> ${esc(x.status)} · <b>Tablero:</b> ${esc(x.board||'')}</p><p><b>Keywords:</b> ${esc(x.hash||'')}</p>`).join('')}</body></html>`;
+}
+function downloadBlob(content,type,name){const b=new Blob([content],{type});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;a.click();}
+function exportReport(){downloadBlob(buildReportText(),'text/plain','informe-im-'+new Date().toISOString().split('T')[0]+'.txt');toast('✓ Informe descargado');}
+function exportReportWord(){downloadBlob(buildReportHTML(),'application/msword','informe-im-'+new Date().toISOString().split('T')[0]+'.doc');toast('✓ Word descargado');}
+function exportReportPDF(){
+  const w=window.open('','_blank');
+  w.document.write(buildReportHTML());w.document.close();w.focus();setTimeout(()=>w.print(),500);toast('✓ Vista PDF abierta');
 }
 function updateStorageInfo(){
   const el=document.getElementById('storageInfo');if(!el)return;
@@ -1395,7 +1508,7 @@ function updateStorageInfo(){
 function renderAll(){
   renderIdeas();renderScripts();renderCarousels();renderStories();renderPins();
   renderTasks();renderMetHist();renderAllCK();
-  renderPillars();renderMethod();renderPhases();renderStrat();
+  renderPillars();renderMethod();renderPhases();renderStrat();renderHomeBrandSummary();
   updateBadges();updateHomeMetrics();renderCal();renderHomeWeek();renderHomeToday();renderHomePillars();
 }
 
